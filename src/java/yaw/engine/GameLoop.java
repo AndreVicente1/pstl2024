@@ -11,7 +11,6 @@ import yaw.engine.light.LightModel;
 import yaw.engine.mesh.Texture;
 import yaw.engine.shader.ShaderManager;
 import yaw.engine.shader.ShaderProgram;
-import yaw.engine.shader.ShaderProgramADS;
 import yaw.engine.skybox.Skybox;
 
 import java.util.Vector;

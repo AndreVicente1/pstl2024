@@ -1,7 +1,6 @@
 package yaw.engine.mesh;
 
 import org.joml.Vector3f;
-import org.w3c.dom.Text;
 
 /**
  * More complex material classes:
@@ -29,6 +28,12 @@ public class Material {
     public Texture map_Bump = null;
     public Texture map_Ns = null;
     public float opacity;
+
+    /* Debug
+    public String toString(){
+        return "MATERIAL\nmap_kd = " + map_Kd.getId() +
+                " map_ns = " + map_Ns.getId();
+    } */
 
     public Material(Vector3f baseColor, Vector3f ambient, Vector3f emissive, float emissiveAmount, Vector3f diffuse, Vector3f specular, float shininess, boolean withShadows) {
         this.baseColor = baseColor;
@@ -129,4 +134,6 @@ public class Material {
     public Texture getSpecularTexture(){ return map_Ns; }
 
     public void setSpecularTexture(Texture texture) {this.map_Ns = texture;}
+
+    public boolean hasSpecularMap() { return map_Ns != null;}
 }

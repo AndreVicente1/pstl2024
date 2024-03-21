@@ -10,6 +10,7 @@ import yaw.engine.light.LightModel;
 import yaw.engine.mesh.strategy.DefaultDrawingStrategy;
 import yaw.engine.shader.ShaderProgram;
 import yaw.engine.shader.ShaderProgramADS;
+import yaw.engine.shader.ShaderProgramPBR;
 import yaw.engine.shader.ShaderProperties;
 import yaw.engine.util.LoggerYAW;
 
@@ -71,7 +72,8 @@ public class Mesh {
                 lightModel.maxPointLights,
                 lightModel.maxSpotLights,
                 material.isTextured(),
-                material.withShadows && lightModel.hasDirectionalLight);
+                material.withShadows && lightModel.hasDirectionalLight,
+                material.hasSpecularMap());
     }
 
     /**
@@ -132,19 +134,35 @@ public class Mesh {
 
     }
 
-    public void renderSetup(Camera pCamera, ShaderProgramADS shaderProgram) {
+    public void renderSetup(Camera pCamera, ShaderProgram shaderProgram) {
         initRender();
         shaderProgram.bind();
         /* Set the camera to render. */
         shaderProgram.setUniform("worldMatrix", pCamera.getWorldMat());
         shaderProgram.setUniform("camera_pos", pCamera.getPosition());
 
-        /* uniforms PBR */
-        shaderProgram.setUniform("material.texture_sampler", 0);
-        shaderProgram.setUniform("material.specularMap", 1);
+        ShaderProgramADS shADS;
+        ShaderProgramPBR shPBR;
+
+        // PBR shader program
+        if (shaderProgram instanceof ShaderProgramPBR) {
+            shPBR = (ShaderProgramPBR) shaderProgram;
+            shPBR.setUniform("material", material);
+            if (material.hasSpecularMap()) {
+                shaderProgram.setUniform("material.specularMap", 1);
+
+            }
+        } else { // ADS shader program
+            shADS = (ShaderProgramADS) shaderProgram;
+            shADS.setUniform("material", material);
+        }
+
+        if (material.isTextured()) {
+            shaderProgram.setUniform("material.texture_sampler", 0);
+        }
         //shaderProgram.setUniform("material.normalMap", 2);
 
-        shaderProgram.setUniform("material", material);
+
     }
 
     public void renderItem(ItemObject item, ShaderProgram shaderProgram) {
@@ -280,11 +298,10 @@ public class Mesh {
             // Activate first texture bank
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture.getId()); // Binds the texture to its mId
-            System.out.println("texutre diffuse"+texture.getId());
             // Bind the texture
             texture.bind();
         }
-        Texture specularMap = material != null ? material.getSpecularTexture() : null;
+        Texture specularMap = material.getSpecularTexture() != null ? material.getSpecularTexture() : null;
         if (specularMap != null){
             //System.out.println("specular not null");
             if (!specularMap.isActivated()){
@@ -293,15 +310,10 @@ public class Mesh {
             // Activate second texture bank
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, specularMap.getId()); // Binds the texture to its mId
-            System.out.println("texutre specular"+specularMap.getId());
             //bind specularMap
             specularMap.bind();
-        } else{
-            //if no specular map is provided use a default white texture
-            if (material != null){
-                material.setSpecularTexture(Texture.createWhiteTexture()); // TODO : create this texture only once ? to avoid multiple identical white textures
-            }
         }
+
         // Draw the mesh
         glBindVertexArray(vaoId);
         glEnableVertexAttribArray(0);

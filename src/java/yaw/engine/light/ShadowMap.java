@@ -6,7 +6,6 @@ import org.joml.Vector4f;
 import yaw.engine.SceneRenderer;
 import yaw.engine.camera.Camera;
 import yaw.engine.items.ItemObject;
-import yaw.engine.mesh.Material;
 import yaw.engine.mesh.Mesh;
 import yaw.engine.shader.*;
 
