@@ -2,7 +2,6 @@ package test.yaw;
 
 import org.joml.Vector3f;
 import yaw.engine.SceneRendererPBR;
-import yaw.engine.SceneRenderer;
 import yaw.engine.UpdateCallback;
 import yaw.engine.World;
 import yaw.engine.items.Item;
@@ -18,7 +17,7 @@ import java.io.IOException;
 /**
  * Basic example of a cube rotating on y axis
  */
-public class RotatingObjTestWindMill implements UpdateCallback {
+public class RotatingObjTestWindMillPBR implements UpdateCallback {
 	private int nbUpdates = 0;
 	private double totalDeltaTime = 0.0;
 	private static long deltaRefreshMillis = 1000;
@@ -26,7 +25,7 @@ public class RotatingObjTestWindMill implements UpdateCallback {
 	private Item obj;
 	private float speed = 0.1f;
 
-	public RotatingObjTestWindMill(Item obj) {
+	public RotatingObjTestWindMillPBR(Item obj) {
 		this.obj = obj;
 	}
 	
@@ -64,7 +63,7 @@ public class RotatingObjTestWindMill implements UpdateCallback {
 	public static void main(String[] args) {
 
 		World world = new World(0, 0, 800, 600);
-		world.installScene(new SceneRenderer(new LightModel()));
+		world.installScene(new SceneRendererPBR(new LightModel()));
 		world.getSceneLight().setDirectionalLight(new DirectionalLight(new Vector3f(1,1,1), 0.7f, new Vector3f(-1,-1,-1)));
 		world.getSceneLight().setAmbientLight(new AmbientLight(0.3f));
 		ObjLoader objLoader = new ObjLoader();
@@ -102,7 +101,7 @@ public class RotatingObjTestWindMill implements UpdateCallback {
 
 		world.getCamera().translate(0, 3,5.5f);
 
-		RotatingObjTestWindMill rObj = new RotatingObjTestWindMill(grp);
+		RotatingObjTestWindMillPBR rObj = new RotatingObjTestWindMillPBR(grp);
 
 		world.registerUpdateCallback(rObj);
 
