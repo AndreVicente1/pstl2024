@@ -301,7 +301,10 @@ public class Mesh {
             // Bind the texture
             texture.bind();
         }
-        Texture specularMap = material.getSpecularTexture() != null ? material.getSpecularTexture() : null;
+        Texture specularMap = null;
+        if (material != null) {
+            specularMap = material.getSpecularTexture() != null ? material.getSpecularTexture() : null;
+        }
         if (specularMap != null){
             //System.out.println("specular not null");
             if (!specularMap.isActivated()){
@@ -321,7 +324,7 @@ public class Mesh {
         glEnableVertexAttribArray(2);
 
         //color
-        glEnableVertexAttribArray(3);
+        //glEnableVertexAttribArray(3);
     }
 
     protected void endRender() {

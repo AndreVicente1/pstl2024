@@ -318,7 +318,9 @@ public class ObjLoader {
             float tx, ty;
             try {
                 tx = Float.parseFloat(parts[1]);
-                ty = Float.parseFloat(parts[2]);
+                ty = 1.0f - Float.parseFloat(parts[2]); // on a inversé les coordonnées de textures car en OpenGL, l'origine (0,0) est en haut à droite
+                                                        // dans notre cas, l'origine est en bas à gauche
+                                                        // le mapping est correcte maintenant
             } catch (NumberFormatException e) {
                 throw new ParseError("Cannot parse texture coordinates", linepos, e);
             }

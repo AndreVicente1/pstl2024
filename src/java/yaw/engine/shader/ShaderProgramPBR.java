@@ -195,7 +195,7 @@ public class ShaderProgramPBR extends ShaderProgram {
     }
 
     public ShaderCode fragmentShader(boolean hasDirectionalLight, int maxPointLights, int maxSpotLights, boolean hasTexture, boolean withShadows, boolean hasSpecularMap) {
-
+        System.out.println("PBR");
         ShaderCode code = new ShaderCode(glVersion, glCoreProfile)
                 .cmt("Fragment shader for P(hysically) B(ased) R(endering)")
                 .l();
@@ -369,8 +369,8 @@ public class ShaderProgramPBR extends ShaderProgram {
                 .l("float specularLight = clamp(dot(normal, halfVector), 0.0, 1.0);");
 
 
-        code.l().l("vec3 effectiveDiffuse = material.diffuse * basecolor.rgb * vColor.rgb")
-                .l("float effectiveOpacity = material.opacity * basecolor.a * vColor.a");
+        code.l().l("vec3 effectiveDiffuse = material.diffuse * basecolor.rgb * vColor.rgb;")
+                .l("float effectiveOpacity = material.opacity * basecolor.a * vColor.a;");
 
         code.l("vec3 totalLightRGB = totalLight.rgb;")
                 .l("vec3 emissiveRGB = material.emissiveAmount * material.emissive;");

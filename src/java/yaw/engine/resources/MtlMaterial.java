@@ -55,9 +55,9 @@ public class MtlMaterial {
                 specular == null ? baseColor : specular,
                 shineness,
                 withShadows,
-                map_Kd == null ? null : new Texture(map_Kd),
-                map_Bump == null ? null : new Texture(map_Bump),
-                map_Ns == null ? null : new Texture(map_Ns),
+                map_Kd == null ? null : new Texture("/resources/" + map_Kd),
+                map_Bump == null ? null : new Texture("/resources/" + map_Bump),
+                map_Ns == null ? null : new Texture("/resources/" + map_Ns),
                 opacity);
     }
 

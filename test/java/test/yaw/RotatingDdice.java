@@ -1,7 +1,6 @@
 package test.yaw;
 
 import org.joml.Vector3f;
-import yaw.engine.SceneRendererPBR;
 import yaw.engine.SceneRenderer;
 import yaw.engine.UpdateCallback;
 import yaw.engine.World;
@@ -18,7 +17,7 @@ import java.io.IOException;
 /**
  * Basic example of a cube rotating on y axis
  */
-public class RotatingObjTestWindMill implements UpdateCallback {
+public class RotatingDdice implements UpdateCallback {
 	private int nbUpdates = 0;
 	private double totalDeltaTime = 0.0;
 	private static long deltaRefreshMillis = 1000;
@@ -26,7 +25,7 @@ public class RotatingObjTestWindMill implements UpdateCallback {
 	private Item obj;
 	private float speed = 0.1f;
 
-	public RotatingObjTestWindMill(Item obj) {
+	public RotatingDdice(Item obj) {
 		this.obj = obj;
 	}
 	
@@ -69,7 +68,7 @@ public class RotatingObjTestWindMill implements UpdateCallback {
 		world.getSceneLight().setAmbientLight(new AmbientLight(0.3f));
 		ObjLoader objLoader = new ObjLoader();
 		try {
-			objLoader.parseFromResource("/models/windmill.obj");
+			objLoader.parseFromResource("/models/ddice.obj");
 
 		} catch (IOException e) {
 			System.out.println("Errror : " + e.getMessage());
@@ -102,7 +101,7 @@ public class RotatingObjTestWindMill implements UpdateCallback {
 
 		world.getCamera().translate(0, 3,5.5f);
 
-		RotatingObjTestWindMill rObj = new RotatingObjTestWindMill(grp);
+		RotatingDdice rObj = new RotatingDdice(grp);
 
 		world.registerUpdateCallback(rObj);
 

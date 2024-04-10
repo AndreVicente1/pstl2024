@@ -48,7 +48,7 @@ public class RotatingCube implements UpdateCallback {
 		float angle = 2.0f * 3.1415925f * (float) deltaTime * speed;
 		System.out.println(deltaTime);
 		cube.rotateZ(angle);
-		cube.rotateXYZAround(0f, 3.1415925f * speed * (float) deltaTime, 0f, new Vector3f(0f, 0f, -10f));
+		//cube.rotateXYZAround(0f, 3.1415925f * speed * (float) deltaTime, 0f, new Vector3f(0f, 0f, -10f));
 		//cube.rotateX(0.0f);
 
 

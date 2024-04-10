@@ -191,7 +191,7 @@ public class ShaderProgramADS extends ShaderProgram {
     }
 
     public ShaderCode fragmentShader(boolean hasDirectionalLight, int maxPointLights, int maxSpotLights, boolean hasTexture, boolean withShadows) {
-        //System.out.println("ADS fragment shader");
+        System.out.println("ADS fragment shader");
         ShaderCode code = new ShaderCode(glVersion, glCoreProfile)
                 .cmt("Fragment shader for A(mbient) D(iffuse) S(pecular) rendering")
                 .l();
@@ -361,12 +361,12 @@ public class ShaderProgramADS extends ShaderProgram {
                 .l("finalColor += vec4(material.emissiveAmount * material.emissive, 1)")
 
 
-                .l("vec3 emissive = material.emissiveAmount * material.emissive")
+                //.l("vec3 emissive = material.emissiveAmount * material.emissive")
                 //.l("vec4 diffuseColor = effectiveDiffuse * fakeLight")
                 //.l("vec4 specularColor = material.specular * pow(specularLight, material.shineness)")
-                //.l("fragColor = vec4((finalColor).xyz,1)");
-                .l("vec3 colorComponent = finalColor.xyz + effectiveDiffuse * fakeLight + material.specular * pow(specularLight, material.shineness)")
-                .l("fragColor = vec4(colorComponent, effectiveOpacity)");
+                .l("fragColor = vec4((finalColor).xyz,1)");
+                //.l("vec3 colorComponent = finalColor.xyz + effectiveDiffuse * fakeLight + material.specular * pow(specularLight, material.shineness)")
+                //.l("fragColor = vec4(colorComponent, effectiveOpacity)");
         return code.endMain();
 
     }
