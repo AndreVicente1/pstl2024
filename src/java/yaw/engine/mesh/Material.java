@@ -135,5 +135,12 @@ public class Material {
 
     public void setSpecularTexture(Texture texture) {this.map_Ns = texture;}
 
-    public boolean hasSpecularMap() { return map_Ns != null;}
+    public boolean hasSpecularMap() {
+        System.out.println("BASE COLOR: " + map_Kd);
+        if (map_Ns == null) {
+            System.out.println("material has no specular map");
+        } else {
+            System.out.println("material has specular map: " + map_Ns);
+        }
+        return map_Ns != null;}
 }

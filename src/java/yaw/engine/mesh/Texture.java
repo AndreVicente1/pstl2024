@@ -137,4 +137,8 @@ public class Texture {
     public int getId() {
         return mId;
     }
+
+    public String toString(){
+        return "TEXTURE: " + mFileName;
+    }
 }

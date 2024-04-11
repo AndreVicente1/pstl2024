@@ -70,6 +70,7 @@ public class MtlLoader {
             }
             String matName = parts[1];
             MtlMaterial material = new MtlMaterial(matName);
+            //System.out.println("MTL material: " + material);
             objModel.addMaterial(matName, material);
             currentMaterial = material;
         } else if (parts[0].equals("Ns")) {
@@ -98,6 +99,7 @@ public class MtlLoader {
         } else if (parts[0].equals("map_bump")) {
             currentMaterial.map_Bump = parts[1];
         } else if (parts[0].equals("map_Ns")) {
+            System.out.println("map_Ns : " + parts[1]);
             currentMaterial.map_Ns = parts[1];
         } else {
             // unsupported entry : emit warning ?

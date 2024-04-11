@@ -100,7 +100,7 @@ public class SceneRenderer {
             ShaderProperties meshProps = mesh.getShaderProperties(lightModel);
             // TODO : ugly cast, fix when support for e.g. PBR materials
             ShaderProgramADS meshProgram = (ShaderProgramADS) shaderManager.fetch(meshProps);
-            //System.out.println("meshProgram : "+meshProgram);
+            System.out.println("meshProgram : "+meshProgram);
             if (meshProgram == null) {
                 // create a shader program for this scene / mesh
                 meshProgram = new ShaderProgramADS(meshProps);

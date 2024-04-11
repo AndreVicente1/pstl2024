@@ -6,6 +6,7 @@ import yaw.engine.camera.Camera;
 import yaw.engine.items.ItemObject;
 import yaw.engine.light.LightModel;
 import yaw.engine.mesh.Mesh;
+import yaw.engine.mesh.MeshPBR;
 import yaw.engine.shader.*;
 
 import java.util.ArrayList;
@@ -19,8 +20,11 @@ import java.util.List;
  * and the second is a map where each mesh has a list of items
  */
 public class SceneRendererPBR extends SceneRenderer{
+    //private final HashMap<MeshPBR, List<ItemObject>> mMeshMap;
+
     public SceneRendererPBR(LightModel lightModel) {
         super(lightModel);
+        //mMeshMap = new HashMap<>();
     }
 
     public void render(Camera pCamera, ShaderManager shaderManager) {

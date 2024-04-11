@@ -61,6 +61,7 @@ public class ObjLoader {
         while (linepos < lines.length - 1) {
             linepos++;
             ObjEntry entry = parseLine(linepos, lines[linepos - 1]);
+            System.out.println("entry type: " + entry.getType());
             switch (entry.getType()) {
                 case MTLLIB:
                     MtlLoader mtlLoader = new MtlLoader(objModel);
