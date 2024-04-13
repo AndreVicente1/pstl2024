@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.opengles.GLES30.GL_R8;
 
 
 public class Texture {
@@ -51,30 +52,31 @@ public class Texture {
 
                 PNGDecoder mDecoder = new PNGDecoder(lInputStream);
 
-                //
-
                 this.mWidth = mDecoder.getWidth();
                 this.mHeight = mDecoder.getHeight();
                 ByteBuffer lByteBuffer;
+                int internalFormat;
+                int format;
+
                 if (mDecoder.isRGB()){
-                    // Load texture contents into a byte buffer
+                    // For RGB textures
                     lByteBuffer = ByteBuffer.allocateDirect(
-                            4 * mDecoder.getWidth() * mDecoder.getHeight());
-                    mDecoder.decode(lByteBuffer, mDecoder.getWidth() * 4, PNGDecoder.Format.RGBA);
+                            4 * mWidth * mHeight);
+                    mDecoder.decode(lByteBuffer, mWidth * 4, PNGDecoder.Format.RGBA);
                     lByteBuffer.flip();
+                    internalFormat = GL_RGBA;
+                    format = GL_RGBA;
                 }
                 else{
-
-                    // Load texture contents into a byte buffer
+                    // For grayscale textures
                     lByteBuffer = ByteBuffer.allocateDirect(
-                            4 * mDecoder.getWidth() * mDecoder.getHeight());
-                    mDecoder.decode(lByteBuffer, mDecoder.getWidth() * 4, PNGDecoder.Format.LUMINANCE);
+                            mWidth * mHeight);
+                    mDecoder.decode(lByteBuffer, mWidth, PNGDecoder.Format.LUMINANCE);
                     lByteBuffer.flip();
-
+                    internalFormat = GL_R8; // single channel format
+                    format = GL_RED; // format is red channel only
                 }
 
-
-                // Create a new OpenGL texture
                 this.mId = glGenTextures();
                 
                 // Bind the texture
@@ -86,7 +88,7 @@ public class Texture {
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 // Upload the texture data
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this.mWidth, this.mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, lByteBuffer);
+                glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, this.mWidth, this.mHeight, 0, format, GL_UNSIGNED_BYTE, lByteBuffer);
                 // Generate Mip Map: A mipmap is a decreasing resolution set of images generated from a high detailed texture.
                 glGenerateMipmap(GL_TEXTURE_2D);
                 lInputStream.close();

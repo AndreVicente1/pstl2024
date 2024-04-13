@@ -376,18 +376,19 @@ public class ShaderProgramPBR extends ShaderProgram {
         code.l("vec3 totalLightRGB = totalLight.rgb;")
                 .l("vec3 emissiveRGB = material.emissiveAmount * material.emissive;");
 
-        code.l().l("vec4 finalColor = basecolor * totalLight");
+        code.l().l("vec4 finalColor = vec4( basecolor * totalLight)");
 
         code.l("if (useSpecularMap == 1) {");
-            code.l().l("vec4 specularMapColor = texture(material.specularMap, vTexCoord)")
-                    .l("vec3 effectiveSpecular = material.specular * specularMapColor.rgb");
+            code.l().l("float specularIntensity = texture(material.specularMap, vTexCoord).r;")
+                    .l("vec3 effectiveSpecular = material.specular * vec3(specularIntensity);");
 
             //code.l("fragColor = vec4(emissiveRGB + totalLightRGB + effectiveDiffuse * fakeLight + effectiveSpecular * pow(specularLight, material.shininess), effectiveOpacity);");
-            code.l().l("finalColor += vec4(emissiveRGB + effectiveDiffuse * fakeLight + (effectiveSpecular+5) * pow(specularLight, (material.shininess+3)), effectiveOpacity);");
+            code.l().l(" finalColor += vec4(emissiveRGB + effectiveDiffuse * fakeLight + effectiveSpecular * pow(specularLight, material.shininess), effectiveOpacity);");
+            //code.l().l("fragColor = specularMapColor;");
         code.l("} else {");
 
-            code.l().l("finalColor += vec4(emissiveRGB + effectiveDiffuse * fakeLight + material.specular * pow(specularLight, material.shininess), effectiveOpacity);");
-
+        code.l().l("finalColor += vec4(emissiveRGB + effectiveDiffuse * fakeLight + material.specular * pow(specularLight, material.shininess), effectiveOpacity);");
+        //code.l().l("fragColor = vec4((finalColor).xyz,1)");
         code.l("}");
 
         code.l().l("fragColor = vec4((finalColor).xyz,1)");
@@ -411,11 +412,9 @@ public class ShaderProgramPBR extends ShaderProgram {
         //System.out.println("specMAp=  " + specMap);
         System.out.println("creating uniform " + uniformName);
         if (textured) {
-            System.out.println("textured ");
             createUniform(uniformName + ".texture_sampler");
 
         } else {
-            System.out.println("not textured ");
             createUniform(uniformName + ".color");
         }
 //        if (shaderProperties.hasSpecularMap) {
@@ -445,11 +444,8 @@ public class ShaderProgramPBR extends ShaderProgram {
             setUniform(uniformName + ".color", material.getBaseColor());
         }
         if (material.hasSpecularMap()) {
-            System.out.println("SETTING HAS SPECULAR MAP");
             createUniform(uniformName + ".specularMap");
             setUniform(uniformName + ".specularMap", 1);
-        } else {
-            System.out.println("SETTING NO SPECULAR MAP");
         }
 
         setUniform(uniformName + ".ambient", material.getAmbientColor());

@@ -44,6 +44,7 @@ public class ObjModel {
     }
 
     public void addMaterial(String matName, MtlMaterial material) {
+        //System.out.println("Adding material " + material);
         if (materials.containsKey(matName)) {
             throw new Error("Material '" + matName + "' already added.");
         }
