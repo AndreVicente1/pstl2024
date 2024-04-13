@@ -5,6 +5,7 @@ import org.joml.Matrix4f;
 import yaw.engine.camera.Camera;
 import yaw.engine.items.ItemObject;
 import yaw.engine.light.LightModel;
+import yaw.engine.mesh.Material;
 import yaw.engine.mesh.Mesh;
 import yaw.engine.mesh.MeshPBR;
 import yaw.engine.shader.*;
@@ -59,8 +60,13 @@ public class SceneRendererPBR extends SceneRenderer{
                     mesh.initBuffers();
                     super.getNotInit().remove(mesh);
                 }
+                meshProgram.prepareMaterial(mesh.getMaterial());
                 mesh.renderSetup(pCamera, meshProgram);
+                System.out.println("mesh: " + mesh);
+                //meshProgram.prepareMaterial(mesh.getMaterial());
+
                 for (ItemObject item : lItems) {
+                    //meshProgram.prepareMaterial(item.getMesh().getMaterial()); //added
                     mesh.renderItem(item, meshProgram);
                     if (item.showVertexHelpers()) {
                         vertexHelpers.add(item);

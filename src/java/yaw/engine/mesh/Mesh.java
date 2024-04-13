@@ -84,6 +84,8 @@ public class Mesh {
         vaoId = glGenVertexArrays();
         glBindVertexArray(vaoId);
 
+        //System.out.println("vaoid = " + vaoId);
+
         //Initialization of VBO
         if (geometry == null) {
             throw new IllegalStateException("Geometry is not initialized.");
@@ -277,6 +279,7 @@ public class Mesh {
     }
 
     public void initRender() {
+
         Texture texture = material != null ? material.getTexture() : null;
         if (texture != null) {
             //load the texture if needed
@@ -290,6 +293,10 @@ public class Mesh {
         }
         Texture specularMap = material != null ? material.getSpecularTexture() : null;
         if (specularMap != null) {
+            if (!specularMap.isActivated()) {
+                specularMap.init();
+            }
+            System.out.println("SPECULAR MAP: " + specularMap + "\nbinding");
             // Activate second texture bank for specular map
             glActiveTexture(GL_TEXTURE1);
             // Bind the specular map
@@ -331,5 +338,9 @@ public class Mesh {
 
     public Geometry getGeometry() {
         return geometry;
+    }
+
+    public String toString(){
+        return "Mesh with mat: "+material.getSpecularTexture();
     }
 }

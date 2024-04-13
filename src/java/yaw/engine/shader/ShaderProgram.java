@@ -159,7 +159,8 @@ public abstract class ShaderProgram {
     public int createUniform(String uniformName) {
         int res = glGetUniformLocation(mProgramId, uniformName);
         if (res < 0) {
-            throw new Error("Uniform creation error: " + uniformName);
+            System.out.println("Uniform creation error: " + uniformName);
+            return -1;
         }
         mUniformsList.put(uniformName, res);
         return res;
@@ -237,7 +238,13 @@ public abstract class ShaderProgram {
      * @param value       the float
      */
     public void setUniform(String uniformName, int value) {
-        glUniform1i(mUniformsList.get(uniformName), value);
+        System.out.println("============> " + uniformName + " : " + value + " <============");
+        Integer location = mUniformsList.get(uniformName);
+        if (location != null) {
+            glUniform1i(location, value);
+        } else {
+            System.err.println("Uniform '" + uniformName + "' not found or not used in the shader.");
+        }
     }
 
     /**
