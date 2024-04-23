@@ -15,12 +15,15 @@ public class GeometryBuilder {
 
     private List<Vector3f> normals;
 
+    private List<Vector3f> tangents; // tangentes
+
 
     public GeometryBuilder() {
         vertices = new ArrayList<>();
         triangles = new ArrayList<>();
         textCoords = new ArrayList<>();
         normals = new ArrayList<>();
+        tangents = new ArrayList<>();
     }
 
     public int addVertex(float x, float y, float z) {
@@ -170,6 +173,58 @@ public class GeometryBuilder {
             i += 2;
         }
         return tcoords;
+    }
+
+    public void generateTangents() {
+        if (tangents.size() != vertices.size()) {
+            tangents.clear();
+            for (int i = 0; i < vertices.size(); i++) {
+                tangents.add(new Vector3f());
+            }
+        }
+
+        for (int i = 0; i < triangles.size(); i++) {
+            Vector3i tri = triangles.get(i);
+
+            int idxV1 = tri.x;
+            int idxV2 = tri.y;
+            int idxV3 = tri.z;
+
+            Vector3f p1 = vertices.get(idxV1);
+            Vector3f p2 = vertices.get(idxV2);
+            Vector3f p3 = vertices.get(idxV3);
+
+            Vector2f uv1 = textCoords.get(idxV1);
+            Vector2f uv2 = textCoords.get(idxV2);
+            Vector2f uv3 = textCoords.get(idxV3);
+
+            Vector3f edge1 = new Vector3f();
+            Vector3f edge2 = new Vector3f();
+            p2.sub(p1, edge1);
+            p3.sub(p1, edge2);
+
+            Vector2f deltaUV1 = new Vector2f();
+            Vector2f deltaUV2 = new Vector2f();
+            uv2.sub(uv1, deltaUV1);
+            uv3.sub(uv1, deltaUV2);
+
+            float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+            Vector3f tangent = new Vector3f();
+            tangent.set(
+                    f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
+                    f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
+                    f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z)
+            );
+
+            tangent.normalize();
+            tangents.set(idxV1, tangents.get(idxV1).add(tangent));
+            tangents.set(idxV2, tangents.get(idxV2).add(tangent));
+            tangents.set(idxV3, tangents.get(idxV3).add(tangent));
+        }
+
+        for (Vector3f tan : tangents) {
+            tan.normalize();
+        }
     }
 
     public Geometry build() {

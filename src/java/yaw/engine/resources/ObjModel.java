@@ -92,9 +92,9 @@ public class ObjModel {
                 if (mat.map_Kd != null){
                     mat.setTexture(mat.map_Kd);
                 }
-                else{
+                else {
                     //  texture not provided
-                    mat.setSpecularColor(new Vector3f(1,1,1));
+                    mat.setSpecularColor(new Vector3f(1, 1, 1));
                 }
 
             } else {

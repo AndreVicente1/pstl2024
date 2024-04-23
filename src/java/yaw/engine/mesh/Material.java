@@ -135,6 +135,17 @@ public class Material {
 
     public void setSpecularTexture(Texture texture) {this.map_Ns = texture;}
 
+    public Texture getNormalTexture(){ return map_Bump; }
+
+    public boolean hasNormalMap() {
+        if (map_Bump == null){
+            System.out.println("material has no normal map");
+        } else {
+            System.out.println("material has normal map: " + map_Bump);
+        }
+        return map_Bump != null;
+    }
+
     public boolean hasSpecularMap() {
         System.out.println("BASE COLOR: " + map_Kd);
         if (map_Ns == null) {

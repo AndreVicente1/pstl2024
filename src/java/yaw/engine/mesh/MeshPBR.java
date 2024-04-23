@@ -285,6 +285,13 @@ public class MeshPBR extends Mesh{
             specularMap.bind();
         }
 
+        Texture normalMap = material != null ? material.getNormalTexture() : null;
+        if (normalMap != null) {
+            System.out.println("===========================NORMAL NOT NULL");
+            glActiveTexture(GL_TEXTURE2);
+            normalMap.bind();
+        } else System.out.println("NORMAL NULL!!!!");
+
         // Draw the mesh
         glBindVertexArray(vaoId);
         glEnableVertexAttribArray(0); // Position
@@ -303,6 +310,8 @@ public class MeshPBR extends Mesh{
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, 0);
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 

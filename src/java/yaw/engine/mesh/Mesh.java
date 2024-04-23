@@ -302,6 +302,16 @@ public class Mesh {
             // Bind the specular map
             specularMap.bind();
         }
+        Texture normalMap = material != null ? material.getNormalTexture() : null;
+        if (normalMap != null) {
+            if (!normalMap.isActivated()) {
+                normalMap.init();
+            }
+            // Activate third texture bank for normal map
+            glActiveTexture(GL_TEXTURE2);
+            // Bind the normal map
+            normalMap.bind();
+        }
 
         // Draw the mesh
         glBindVertexArray(vaoId);

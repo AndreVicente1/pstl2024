@@ -243,6 +243,8 @@ public class ObjLoader {
             geom.addTriangle(glTriangle.indice1, glTriangle.indice2, glTriangle.indice3);
         }
 
+        geom.generateTangents();
+
         if (objName == null) {
             objName = objModel.getFreshGeomName();
         }

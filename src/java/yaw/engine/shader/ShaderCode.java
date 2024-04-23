@@ -142,6 +142,16 @@ public class ShaderCode {
         return endBlock();
     }
 
+    public ShaderCode beginElse() {
+        mkIndent();
+        code.append("else \n");
+        return beginBlock();
+    }
+
+    public ShaderCode endElse() {
+        return endBlock();
+    }
+
     public ShaderCode beginFor(String init, String cond, String update) {
         mkIndent();
         code.append("for (");

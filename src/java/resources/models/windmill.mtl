@@ -11,7 +11,7 @@ Ni 1.000000
 d 1.000000
 illum 1
 map_Kd windmill_001_lopatky_COL.png
-
+map_bump windmill_001_lopatky_NOR.png
 
 newmtl windmill
 Ns 0.000000
@@ -23,4 +23,5 @@ Ni 1.000000
 d 1.000000
 illum 1
 map_Kd windmill_001_base_COL.png
+map_bump windmill_001_base_NOR.png
 map_Ns windmill_001_base_SPEC.png
