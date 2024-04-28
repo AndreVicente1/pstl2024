@@ -2,6 +2,7 @@ package yaw.engine.resources;
 
 import org.joml.Vector3f;
 import yaw.engine.mesh.Material;
+import yaw.engine.mesh.Texture;
 
 import static org.joml.Math.clamp;
 
@@ -15,6 +16,10 @@ public class MtlMaterial {
     public Vector3f specular = null;
     public Vector3f emissive = null;
     public float opacity = 0;
+
+    public String map_Kd = null;
+    public String map_Bump = null;
+    public String map_Ns = null;
 
     public MtlMaterial(String name) {
         this.name = name;
@@ -42,7 +47,11 @@ public class MtlMaterial {
                 diffuse == null ? baseColor : diffuse,
                 specular == null ? baseColor : specular,
                 shineness,
-                withShadows);
+                withShadows,
+                map_Kd == null ? null : new Texture("/resources/" + map_Kd),
+                map_Bump == null ? null : new Texture("/resources/" + map_Bump),
+                map_Ns == null ? null : new Texture("/resources/" + map_Ns),
+                opacity);
     }
 
     public Material getMaterial() {

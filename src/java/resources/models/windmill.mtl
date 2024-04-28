@@ -1,0 +1,27 @@
+# Blender MTL File: 'windmill_001.blend'
+# Material Count: 2
+
+newmtl Material
+Ns 25.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 3.000000 2.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd windmill_001_lopatky_COL.png
+map_bump windmill_001_lopatky_NOR.png
+
+newmtl windmill
+Ns 25.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 3.000000 2.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd windmill_001_base_COL.png
+map_bump windmill_001_base_NOR.png
+map_Ns windmill_001_base_SPEC.png

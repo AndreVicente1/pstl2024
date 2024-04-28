@@ -107,6 +107,7 @@ public class SceneRenderer {
                 // create a shader program for this scene / mesh
                 meshProgram = new ShaderProgramADS(meshProps);
                 shaderManager.register(meshProps, meshProgram);
+                meshProgram.prepareMaterial(mesh.getMaterial());
                 meshProgram.init();
             }
             /* Setup lights */
@@ -136,7 +137,6 @@ public class SceneRenderer {
                         axisHelpers.add(item);
                     }
                 }
-
                 mesh.renderCleanup(meshProgram);
 
                 if (!vertexHelpers.isEmpty()) {

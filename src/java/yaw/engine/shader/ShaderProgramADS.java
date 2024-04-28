@@ -4,6 +4,9 @@ import org.joml.Vector3f;
 import yaw.engine.light.LightModel;
 import yaw.engine.mesh.Material;
 
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
+import static org.lwjgl.opengl.GL20.glUniform1i;
+
 public class ShaderProgramADS extends ShaderProgram {
     private final String glVersion;
     private final boolean glCoreProfile;
@@ -140,11 +143,17 @@ public class ShaderProgramADS extends ShaderProgram {
                 .l("layout(location = 0) in vec3 position")
                 .l("layout(location = 1) in vec2 texCoord")
                 .l("layout(location = 2) in vec3 normal")
+
+                .l("layout(location = 3) in vec4 color")
+                .l("layout(location = 4) in vec3 tangent")
                 .l()
                 .cmt("Output values")
                 .l("out vec3 vPos")
                 .l("out vec2 vTexCoord")
-                .l("out vec3 vNorm");
+                .l("out vec3 vNorm")
+
+                .l("out vec4 vColor")
+                .l("out vec3 vTangent");
 
         if (withShadows) {
             code.l().cmt("Shadow properties")
@@ -173,7 +182,12 @@ public class ShaderProgramADS extends ShaderProgram {
                 .cmt("Computation of normal vector")
                 .l("vNorm = normalize(mat3(normalMatrix) * normal)")
                 .cmt("Texture coordinates")
-                .l("vTexCoord = texCoord");
+                .l("vTexCoord = texCoord")
+
+                .cmt("Vertexes Color")
+                .l("vColor = color")
+                .cmt("Normal map tangents")
+                .l("vTangent = normalize(mat3(normalMatrix) * tangent)");
 
         if (withShadows) {
             code.l().cmt("Shadow output")
@@ -207,8 +221,12 @@ public class ShaderProgramADS extends ShaderProgram {
         code.l().cmt("Input values")
                 .l("in vec3 vPos")
                 .l("in vec2 vTexCoord")
-                .l("in vec3 vNorm");
+                .l("in vec3 vNorm")
 
+                 .cmt("Vertexes color")
+                .l("in vec4 vColor")
+                .cmt("Normal map tangents")
+                .l("in vec3 vTangent");
         if (withShadows) {
             code.l("in vec4 vDirectionalShadowSpace");
         }
@@ -249,19 +267,25 @@ public class ShaderProgramADS extends ShaderProgram {
             code.item("vec3", "color", "Non-textured material");
         }
 
+        code.item("sampler2D", "specularMap", "Specular");
+        code.item("sampler2D", "normalMap", "Normal map");
         code.item("vec3", "ambient", "the ambient color (multiplied by ambient light)")
                 .item("vec3", "emissive", "Emissive color (added to overally color)")
                 .item("float", "emissiveAmount", "The percentage (0 .. 1.0) of emissive color")
                 .item("vec3", "diffuse", "the diffuse color (if no diffuse map")
                 .item("vec3", "specular", "the specular color (if no specular map)")
                 .item("float", "shineness", "for reflectance computation")
+                .item("float", "opacity","material opacity from 0.0 (fully transparent) to 1.0 (fully opaque)")
                 .endStruct().l();
 
         code.cmt("Fragment shader uniforms")
                 .l("uniform vec3 camera_pos")
                 .l("uniform Material material")
                 .l().cmt("Lights")
-                .l("uniform vec3 ambientLight");
+                .l("uniform vec3 ambientLight")
+                .cmt("Determine whether the material has a specular or normal map")
+                .l("uniform int useSpecularMap")
+                .l("uniform int useNormalMap");
 
         if (hasDirectionalLight) {
             code.l("uniform DirectionalLight directionalLight");
@@ -310,6 +334,16 @@ public class ShaderProgramADS extends ShaderProgram {
         code.l().beginMain()
                 .l("vec3 normal = vNorm").l();
 
+        // normal map
+        code.beginIf("useNormalMap == 1");
+        code.l("vec3 tangent = normalize(vTangent)")
+                .l("vec3 bitangent = normalize(cross(normal, tangent))")
+
+                .l().l("mat3 tbn = mat3(tangent, bitangent, normal)")
+                .l("normal = texture(material.normalMap, vTexCoord).rgb * 3. - 1.")
+                .l("normal = normalize(tbn * normal)");
+        code.endIf();
+
         if (hasTexture) {
             code.l("vec4 basecolor = texture(material.texture_sampler, vTexCoord)");
         } else {
@@ -338,9 +372,34 @@ public class ShaderProgramADS extends ShaderProgram {
             code.endFor();
         }
 
-        code.l().l("vec4 finalColor = basecolor * totalLight")
-                .l("finalColor += vec4(material.emissiveAmount * material.emissive, 1)")
-                .l("fragColor = vec4((finalColor).xyz,1)");
+        //calculations
+        code.l("vec3 lightDirection = normalize(directionalLight.direction);")
+                .l("float fakeLight = dot(lightDirection, normal) * .5 + .5;")
+                .l("vec3 surfaceToViewDirection = normalize(vPos);")
+                .l("vec3 halfVector = normalize(lightDirection + surfaceToViewDirection);")
+                .l("float specularLight = clamp(dot(normal, halfVector), 0.0, 1.0);");
+
+
+        code.l().l("vec3 effectiveDiffuse = material.diffuse * basecolor.rgb * vColor.rgb;")
+                .l("float effectiveOpacity = material.opacity * basecolor.a * vColor.a;");
+
+        code.l("vec3 totalLightRGB = totalLight.rgb;")
+                .l("vec3 emissiveRGB = material.emissiveAmount * material.emissive;");
+
+        code.l().l("vec4 finalColor = vec4(basecolor * totalLight);");
+
+        code.beginIf ("useSpecularMap == 1");
+        code.l().l("vec4 specularIntensity = texture(material.specularMap, vTexCoord);")
+                .l("vec3 effectiveSpecular = material.specular  * specularIntensity.rgb;");
+
+            code.l().l(" finalColor += vec4(emissiveRGB + effectiveDiffuse * fakeLight + effectiveSpecular * pow(specularLight, material.shineness), effectiveOpacity);");
+        code.endIf();
+
+        code.beginElse();
+            code.l().l("finalColor += vec4(emissiveRGB + effectiveDiffuse * fakeLight + material.specular * pow(specularLight, material.shineness), effectiveOpacity);");
+        code.endElse();
+
+        code.l().l("fragColor = finalColor");
 
         return code.endMain();
 
@@ -376,10 +435,21 @@ public class ShaderProgramADS extends ShaderProgram {
         } else {
             setUniform(uniformName + ".color", material.getBaseColor());
         }
+        if (material.hasSpecularMap()) {
+            createUniform(uniformName + ".specularMap");
+            setUniform(uniformName + ".specularMap", 1);
+        }
+        if (material.hasNormalMap()){
+            createUniform(uniformName + ".normalMap");
+            setUniform(uniformName + ".normalMap", 2);
+        }
         setUniform(uniformName + ".ambient", material.getAmbientColor());
         Vector3f emissiveColor = new Vector3f();
         material.getEmissiveColor().mul(material.getEmissiveAmount(), emissiveColor);
         setUniform(uniformName + ".emissive", emissiveColor);
+        setUniform(uniformName + ".diffuse", material.getDiffuseColor());
+        setUniform(uniformName + ".specular", material.getSpecularColor());
+        setUniform(uniformName + ".shineness", material.getShineness());
         setUniform(uniformName + ".diffuse", material.getDiffuseColor());
         setUniform(uniformName + ".specular", material.getSpecularColor());
         setUniform(uniformName + ".shineness", material.getShineness());
@@ -433,6 +503,19 @@ public class ShaderProgramADS extends ShaderProgram {
         if (shaderProperties.withShadows) {
             createUniform("shadowMapSampler");
             createUniform("shadowBias");
+        }
+    }
+    public void prepareMaterial(Material material) {
+        if (material.hasSpecularMap()) {
+            glUniform1i(glGetUniformLocation(this.getId(), "useSpecularMap"), 1); //assigne la valeur 1 pour le code du frag shader
+        } else {
+            glUniform1i(glGetUniformLocation(this.getId(), "useSpecularMap"), 0);
+        }
+
+        if (material.hasNormalMap()) {
+            glUniform1i(glGetUniformLocation(this.getId(), "useNormalMap"), 1);
+        } else {
+            glUniform1i(glGetUniformLocation(this.getId(), "useNormalMap"), 0);
         }
     }
 }

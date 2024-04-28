@@ -241,7 +241,7 @@ public class ObjLoader {
         for (GLTriangle glTriangle : glTriangles) {
             geom.addTriangle(glTriangle.indice1, glTriangle.indice2, glTriangle.indice3);
         }
-
+        geom.generateTangents();
         if (objName == null) {
             objName = objModel.getFreshGeomName();
         }
@@ -319,7 +319,7 @@ public class ObjLoader {
             float tx, ty;
             try {
                 tx = Float.parseFloat(parts[1]);
-                ty = Float.parseFloat(parts[2]);
+                ty = 1 - Float.parseFloat(parts[2]);  // Flip the coordinate for texture mapping from OBJ format to OpenGL format (OBJ's origin is bottom-left, OpenGL's is top-left).
             } catch (NumberFormatException e) {
                 throw new ParseError("Cannot parse texture coordinates", linepos, e);
             }

@@ -90,6 +90,12 @@ public class MtlLoader {
         } else if (parts[0].equals("d")) {
             float opacity = parseMaterialFloat("opacity", parts, linepos);
             currentMaterial.opacity = opacity;
+        } else if (parts[0].equals("map_Kd")) {
+            currentMaterial.map_Kd = parts[1];
+        } else if (parts[0].equals("map_bump")) {
+            currentMaterial.map_Bump = parts[1];
+        } else if (parts[0].equals("map_Ns")) {
+            currentMaterial.map_Ns = parts[1];
         } else {
             // unsupported entry : emit warning ?
         }
