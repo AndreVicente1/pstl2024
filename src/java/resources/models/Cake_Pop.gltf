@@ -1,0 +1,162 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v3.4.50",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "cake_pop_grp"
+        }
+    ],
+    "materials" : [
+        {
+            "doubleSided" : true,
+            "name" : "cake_pop_mat.001",
+            "normalTexture" : {
+                "index" : 0
+            },
+            "occlusionTexture" : {
+                "index" : 1
+            },
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 2
+                },
+                "metallicRoughnessTexture" : {
+                    "index" : 1
+                }
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "Mesh",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "TEXCOORD_0" : 1,
+                        "NORMAL" : 2
+                    },
+                    "indices" : 3,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "textures" : [
+        {
+            "sampler" : 0,
+            "source" : 0
+        },
+        {
+            "sampler" : 0,
+            "source" : 1
+        },
+        {
+            "sampler" : 0,
+            "source" : 2
+        }
+    ],
+    "images" : [
+        {
+            "mimeType" : "image/png",
+            "name" : "Cake_Pop_norm",
+            "uri" : "../Cake_Pop_norm.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Cake_Pop_ao-Cake_Pop_rough-Cake_Pop_metal",
+            "uri" : "../Cake_Pop_ao-Cake_Pop_rough-Cake_Pop_metal.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Cake_Pop_bcolor",
+            "uri" : "../Cake_Pop_bcolor.png"
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 2598,
+            "max" : [
+                1.8240327835083008,
+                13.442249298095703,
+                1.827727198600769
+            ],
+            "min" : [
+                -1.8243026733398438,
+                1.7474405467510223e-05,
+                -1.8261545896530151
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 2598,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 2598,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5123,
+            "count" : 13950,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 31176,
+            "byteOffset" : 0,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 20784,
+            "byteOffset" : 31176,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 31176,
+            "byteOffset" : 51960,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 27900,
+            "byteOffset" : 83136,
+            "target" : 34963
+        }
+    ],
+    "samplers" : [
+        {
+            "magFilter" : 9729,
+            "minFilter" : 9987
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 111036,
+            "uri" : "Cake_Pop.bin"
+        }
+    ]
+}
