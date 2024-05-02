@@ -10,6 +10,7 @@ import yaw.engine.light.LightModel;
 import yaw.engine.mesh.strategy.DefaultDrawingStrategy;
 import yaw.engine.shader.ShaderProgram;
 import yaw.engine.shader.ShaderProgramADS;
+import yaw.engine.shader.ShaderProgramPBR;
 import yaw.engine.shader.ShaderProperties;
 import yaw.engine.util.LoggerYAW;
 
@@ -141,6 +142,17 @@ public class Mesh {
         shaderProgram.setUniform("material", material);
     }
 
+    /* Used for PBR setup */
+    public void renderSetup(Camera pCamera, ShaderProgramPBR shaderProgram) {
+        initRender();
+        shaderProgram.bind();
+        /* Set the camera to render. */
+        shaderProgram.setUniform("worldMatrix", pCamera.getWorldMat());
+        shaderProgram.setUniform("camera_pos", pCamera.getPosition());
+
+        shaderProgram.setUniform("material", material);
+    }
+
     public void renderItem(ItemObject item, ShaderProgram shaderProgram) {
         shaderProgram.setUniform("modelMatrix", item.getModelMatrix());
         Matrix3f normalMatrix = new Matrix3f(item.getModelMatrix());
@@ -225,6 +237,31 @@ public class Mesh {
         if (texture != null) {
             texture.cleanup();
         }
+
+        Texture texture2 = material.getSpecularTexture();
+        if (texture2 != null) {
+            texture2.cleanup();
+        }
+
+        Texture texture3 = material.getNormalTexture();
+        if (texture3 != null) {
+            texture3.cleanup();
+        }
+
+        Texture texture4 = material.getMetallicRoughnessTexture();
+        if (texture4 != null) {
+            texture4.cleanup();
+        }
+
+        Texture texture5 = material.getPbrNormalTexture();
+        if (texture5 != null) {
+            texture5.cleanup();
+        }
+
+        Texture texture6 = material.getEmissiveTexture();
+        if (texture6 != null) {
+            texture6.cleanup();
+        }
         // Delete the VAO
         glBindVertexArray(0);
         glDeleteVertexArrays(vaoId);
@@ -295,11 +332,40 @@ public class Mesh {
             normalMap.bind();
         }
 
+        // PBR
+        Texture metal = material != null ? material.getMetallicRoughnessTexture() : null;
+        if (metal != null) {
+            if (!metal.isActivated()) {
+                metal.init();
+            }
+            glActiveTexture(GL_TEXTURE3);
+            metal.bind();
+        }
+
+        Texture pbrNormal = material != null ? material.getPbrNormalTexture() : null;
+        if (pbrNormal != null) {
+            if (!pbrNormal.isActivated()) {
+                pbrNormal.init();
+            }
+            glActiveTexture(GL_TEXTURE5);
+            pbrNormal.bind();
+        }
+
+        Texture emissive = material != null ? material.getEmissiveTexture() : null;
+        if (emissive != null) {
+            if (!emissive.isActivated()) {
+                emissive.init();
+            }
+            glActiveTexture(GL_TEXTURE6);
+            emissive.bind();
+        }
+
         // Draw the mesh
         glBindVertexArray(vaoId);
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
+
 
     }
 

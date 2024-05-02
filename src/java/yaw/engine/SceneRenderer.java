@@ -180,4 +180,8 @@ public class SceneRenderer {
     public LightModel getLightModel() {
         return lightModel;
     }
+
+    public ArrayList<Mesh> getNotInit() {
+        return notInit;
+    }
 }

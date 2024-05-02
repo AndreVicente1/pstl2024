@@ -3,10 +3,24 @@ package test.yaw;
 import de.javagl.jgltf.model.*;
 import de.javagl.jgltf.model.io.GltfModelReader;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
+import org.joml.Vector3f;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import yaw.engine.SceneRenderer;
+import yaw.engine.SceneRendererPBR;
+import yaw.engine.UpdateCallback;
+import yaw.engine.World;
 import yaw.engine.geom.Geometry;
+import yaw.engine.items.Item;
+import yaw.engine.items.ItemGroup;
+import yaw.engine.light.AmbientLight;
+import yaw.engine.light.DirectionalLight;
+import yaw.engine.light.LightModel;
+import yaw.engine.mesh.Mesh;
 import yaw.engine.mesh.Texture;
+import yaw.engine.resources.GltfLoader;
+import yaw.engine.resources.GltfModel1;
+import yaw.engine.resources.ObjLoader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,87 +30,100 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class GltfLoaderTest {
-    private static GltfModel model;
-    private static List<Geometry> geometries = new ArrayList<>();
-    public static void main(String[] args) throws IOException {
+public class GltfLoaderTest implements UpdateCallback {
+    private int nbUpdates = 0;
+    private double totalDeltaTime = 0.0;
+    private static long deltaRefreshMillis = 1000;
+    private long prevDeltaRefreshMillis = 0;
+    private Item obj;
+    private float speed = 0.1f;
+
+    public GltfLoaderTest(Item obj) {
+        this.obj = obj;
+    }
+
+    public Item getItem() {
+        return obj;
+    }
+
+    public void update(double deltaTime) {
+        nbUpdates++;
+        totalDeltaTime += deltaTime;
+
+        long currentMillis = System.currentTimeMillis();
+        if (currentMillis - prevDeltaRefreshMillis > deltaRefreshMillis) {
+            double avgDeltaTime = totalDeltaTime / (double) nbUpdates;
+            //System.out.println("Average deltaTime = " + Double.toString(avgDeltaTime) +" s ("+nbUpdates+")");
+            nbUpdates = 0;
+            totalDeltaTime = 0.0;
+            prevDeltaRefreshMillis = currentMillis;
+        }
+
+        //cube.rotateXYZ(0f, 3.1415925f * speed * (float) deltaTime, 0f);
+        //cube.rotateZAround(1f, new Vector3f(0f, 0f, -3f));
+
+        float angle = 3.0f * 3.1415925f * (float) deltaTime * speed;
+        //System.out.println(deltaTime);
+        obj.rotateY(angle);
+        //cube.rotateXYZAround(0f, 3.1415925f * speed * (float) deltaTime, 0f, new Vector3f(0f, 0f, -10f));
+        //cube.rotateX(0.0f);
+
+
+    }
+
+    public static void main(String[] args) {
+
+        World world = new World(0, 0, 800, 600);
+        world.installScene(new SceneRendererPBR(new LightModel()));
+        world.getSceneLight().setDirectionalLight(new DirectionalLight(new Vector3f(1,1,1), 0.7f, new Vector3f(-1,-1,-1)));
+        world.getSceneLight().setAmbientLight(new AmbientLight(0.3f));
+        GltfLoader gltfLoader = new GltfLoader();
         Path path = Paths.get("src/java/resources/models/Cake_Pop.gltf");
-        loadGltf(String.valueOf(path));
-    }
+        try {
+            gltfLoader.loadGltf(path.toString());
 
-    public static void loadGltf(String path) throws IOException {
-        GltfModelReader reader = new GltfModelReader();
-        System.out.println("Loading GLTF model from: " + path);
-        model = reader.read(Paths.get(path));
-        processGeometries();
-        System.out.println("Finished processing geometries. Total loaded: " + geometries.size());
-    }
-
-    private static void processGeometries() {
-        System.out.println("Processing geometries...");
-        for (MeshModel mesh : model.getMeshModels()) {
-            for (MeshPrimitiveModel primitive : mesh.getMeshPrimitiveModels()) {
-                Geometry geometry = convertToGeometry(primitive);
-                geometries.add(geometry);
-                System.out.println("Processed a geometry with " + geometry.getVertices().length / 3 + " vertices.");
-            }
+        } catch (IOException e) {
+            System.out.println("Errror : " + e.getMessage());
+            System.exit(1);
         }
-    }
 
-    private static Geometry convertToGeometry(MeshPrimitiveModel meshPrimitive) {
-        System.out.println("Converting mesh primitive to geometry...");
-        AccessorModel vertexAccessor = meshPrimitive.getAttributes().get("POSITION");
-        AccessorModel normalAccessor = meshPrimitive.getAttributes().get("NORMAL");
-        AccessorModel texCoordAccessor = meshPrimitive.getAttributes().get("TEXCOORD_0");
-        AccessorModel indexAccessor = meshPrimitive.getIndices();
+		/* DEBUG
+		Geometry geom = objLoader.getScene().getGeometryByIndex(10).build();
+		Mesh objm = new Mesh(geom);
 
-        float[] vertices = vertexAccessor != null ? extractFloatData((AccessorFloatData) vertexAccessor.getAccessorData()) : new float[0];
-        float[] normals = normalAccessor != null ? extractFloatData((AccessorFloatData) normalAccessor.getAccessorData()) : new float[0];
-        float[] textCoords = texCoordAccessor != null ? extractFloatData((AccessorFloatData) texCoordAccessor.getAccessorData()) : new float[0];
-        int[] indices = indexAccessor != null ? extractIntData(indexAccessor.getAccessorData()) : new int[0];
+		objm.setDrawingStrategy(new DefaultDrawingStrategy());
+		Material mat = new Material();
+		mat.setColor(new Vector3f(0.1f , 0.7f, 0.9f));
+		objm.setMaterial(mat);
+		ItemObject obji = world.createItemObject("obj", 0f, 0f, 0f, 1.0f, objm);
+		obji.translate(0f,0f, -5f);
+		*/
 
-        System.out.println("Vertices: " + vertices.length + " Normals: " + normals.length + " TexCoords: " + textCoords.length + " Indices: " + indices.length);
-        return new Geometry(vertices, textCoords, normals, indices);
-    }
+        Mesh[] meshes = gltfLoader.getScene().buildMeshes(false);
 
-    private static int[] extractIntData(AccessorData accessorData) {
-        if (accessorData instanceof AccessorIntData) {
-            AccessorIntData intData = (AccessorIntData) accessorData;
-            return extractIntFromIntData(intData);
-        } else if (accessorData instanceof AccessorShortData) {
-            AccessorShortData shortData = (AccessorShortData) accessorData;
-            return extractIntFromShortData(shortData);
-        } else {
-            throw new IllegalArgumentException("Unsupported accessor data type for indices: " + accessorData.getClass().getName());
+        int i = 1;
+        ItemGroup grp = world.createGroup("obj");
+        for(Mesh mesh : meshes) {
+            Item obj = world.createItemObject("obj_" + i, 0, 0, 0, 1.0f, mesh);
+            grp.add(obj.getId(), obj);
+            i += 1;
         }
-    }
 
-    private static int[] extractIntFromIntData(AccessorIntData intData) {
-        int totalComponents = intData.getTotalNumComponents();
-        int[] data = new int[totalComponents];
-        for (int i = 0; i < totalComponents; i++) {
-            data[i] = intData.get(i);
-        }
-        return data;
-    }
+        grp.translate(0f,0f, -5f);
 
-    private static int[] extractIntFromShortData(AccessorShortData shortData) {
-        int totalComponents = shortData.getTotalNumComponents();
-        int[] data = new int[totalComponents];
-        for (int i = 0; i < totalComponents; i++) {
-            data[i] = shortData.get(i) & 0xFFFF;  // Convert short to unsigned int
-        }
-        return data;
-    }
+        world.getCamera().translate(0, 3,5.5f);
+
+        GltfLoaderTest rObj = new GltfLoaderTest(grp);
+
+        world.registerUpdateCallback(rObj);
+
+        world.setBackgroundColor(0.5f, 0.5f, 0.5f);
 
 
-    private static float[] extractFloatData(AccessorFloatData accessorData) {
-        int totalComponents = accessorData.getTotalNumComponents();
-        float[] data = new float[totalComponents];
-        for (int i = 0; i < totalComponents; i++) {
-            data[i] = accessorData.get(i);
-        }
-        return data;
+
+
+
+        world.launchSync();
     }
 
 }
