@@ -27,6 +27,14 @@ public class Material {
     private Texture map_Ns;
     private float opacity;
 
+    // PBR
+    private float metallic;
+    private float roughness;
+    private boolean isMetal;
+    private Texture metallicRoughnessTexture;
+    private Texture normalTexture;
+    private Texture emissiveTexture;
+
     public Material(Vector3f baseColor, Vector3f ambient, Vector3f emissive, float emissiveAmount, Vector3f diffuse, Vector3f specular, float shineness, boolean withShadows) {
         this.baseColor = baseColor;
         texture = null;
@@ -73,6 +81,18 @@ public class Material {
         this.map_Bump = map_Bump;
         this.map_Ns = map_Ns;
         this.opacity = opacity;
+    }
+
+    public Material(Vector3f baseColor, boolean withShadows, float metallic, float roughness, boolean isMetal, Texture baseColorTexture,Texture metallicRoughnessTexture, Texture normalTexture, Texture emissiveTexture) {
+        this.baseColor = baseColor;
+        this.withShadows = withShadows;
+        this.metallic = metallic;
+        this.roughness = roughness;
+        this.isMetal = isMetal;
+        this.texture = baseColorTexture;
+        this.metallicRoughnessTexture = metallicRoughnessTexture;
+        this.normalTexture = normalTexture;
+        this.emissiveTexture = emissiveTexture;
     }
 
     public Vector3f getBaseColor() {
@@ -127,5 +147,27 @@ public class Material {
     public boolean hasNormalMap() { return map_Bump != null; }
 
     public boolean hasSpecularMap() { return map_Ns != null; }
+
+    public boolean hasMetallicRoughnessTexture() {return metallicRoughnessTexture != null;}
+
+    public boolean hasPbrNormalTexture() { return normalTexture!= null;}
+
+    public boolean hasEmissiveTexture() { return emissiveTexture != null;}
+
+    public float getMetallic() {return metallic;}
+
+    public float getRoughness() {return roughness;}
+
+    public Texture getMetallicRoughnessTexture() {
+        return metallicRoughnessTexture;
+    }
+
+    public Texture getPbrNormalTexture() {
+        return normalTexture;
+    }
+
+    public Texture getEmissiveTexture() {
+        return emissiveTexture;
+    }
 
 }
