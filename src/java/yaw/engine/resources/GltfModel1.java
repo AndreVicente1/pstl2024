@@ -62,27 +62,4 @@ public class GltfModel1 {
         }
         return meshes.toArray(new Mesh[0]);
     }
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Model Name: ").append(modelName).append("\n");
-
-        sb.append("Geometries:\n");
-        for (Map.Entry<String, Geometry> entry : geometries.entrySet()) {
-            sb.append("  Name: ").append(entry.getKey()).append(", Geometry: ").append(entry.getValue().toString()).append("\n");
-        }
-
-        sb.append("Materials:\n");
-        for (Map.Entry<String, PBRMaterial> entry : materials.entrySet()) {
-            sb.append("  Name: ").append(entry.getKey()).append(", Material: ").append(entry.getValue().toString()).append("\n");
-        }
-
-        sb.append("Material Assignments:\n");
-        for (Map.Entry<String, String> entry : materialAssignments.entrySet()) {
-            sb.append("  Geometry Name: ").append(entry.getKey()).append(", Material Name: ").append(entry.getValue()).append("\n");
-        }
-
-        return sb.toString();
-    }
-
 }

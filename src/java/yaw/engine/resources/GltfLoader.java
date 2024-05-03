@@ -67,6 +67,7 @@ public class GltfLoader {
 
         return material;
     }
+    //TODO : remove this method and change the Texture path
     private String cleanUri(String uri) {
         if (uri.startsWith("../")) {
             return uri.substring(3);
@@ -133,7 +134,6 @@ public class GltfLoader {
         }
         return data;
     }
-
 
     private float[] extractFloatData(AccessorFloatData accessorData) {
         int totalComponents = accessorData.getTotalNumComponents();
