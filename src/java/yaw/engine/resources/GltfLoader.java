@@ -47,25 +47,31 @@ public class GltfLoader {
 
         TextureModel baseColorTexture = model.getBaseColorTexture();
         if (baseColorTexture != null) {
-            material.basecolor = baseColorTexture.getImageModel().getUri();
+            material.basecolorTexture = cleanUri(baseColorTexture.getImageModel().getUri());
         }
 
         TextureModel metallicRoughnessTexture = model.getMetallicRoughnessTexture();
         if (metallicRoughnessTexture != null) {
-            material.metallicRoughnessTexture = metallicRoughnessTexture.getImageModel().getUri();
+            material.metallicRoughnessTexture = cleanUri(metallicRoughnessTexture.getImageModel().getUri());
         }
 
         TextureModel normalTexture = model.getNormalTexture();
-        if (normalTexture != null ) {
-            material.normalTexture = normalTexture.getImageModel().getUri();
+        if (normalTexture != null) {
+            material.normalTexture = cleanUri(normalTexture.getImageModel().getUri());
         }
 
         TextureModel emissiveTexture = model.getEmissiveTexture();
-        if (emissiveTexture != null ) {
-            material.emissiveTexture = emissiveTexture.getImageModel().getUri();
+        if (emissiveTexture != null) {
+            material.emissiveTexture = cleanUri(emissiveTexture.getImageModel().getUri());
         }
 
         return material;
+    }
+    private String cleanUri(String uri) {
+        if (uri.startsWith("../")) {
+            return uri.substring(3);
+        }
+        return uri;
     }
 
     private void processGeometries() {

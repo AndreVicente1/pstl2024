@@ -63,29 +63,24 @@ public class ShaderProgramPBR extends ShaderProgram {
     }
 
     public static ShaderCode computeSpotLight(ShaderCode code) {
-        code.function("vec4", "computeSpotLightPBR",
-                new String[][]{{"SpotLight", "light"},
-                        {"vec3", "position"},
-                        {"vec3", "normal"},
-                        {"vec3", "viewDir"},
-                        {"Material", "material"}});
+        code.function("vec4", "computeSpotLightPBR", new String[][]{{"SpotLight", "light"}
+                , {"vec3", "position"}
+                , {"vec3", "normal"}});
 
-        code.l("vec3 toLight = light.position - position;")
-                .l("vec3 lightDir = normalize(toLight);")
-                .l("vec3 view = normalize(viewDir - position);")
-                .l("float distance = length(toLight);")
-                .l("float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * distance * distance);")
-                .l("vec3 spotDirection = normalize(light.direction);")
-                .l("float spotEffect = dot(lightDir, spotDirection);")
-                .l("vec4 lightEffect = vec4(0.0);");
+        code.l().l("vec3 light_direction = light.pl.position - position")
+                .l("vec3 to_light_dir  = normalize(light_direction)")
+                .l("vec3 from_light_dir  = -to_light_dir")
+                .l("float spot_alfa = dot(from_light_dir, normalize(light.conedir))")
+                .l("vec4 color = vec4(0, 0, 0, 0)");
 
-        code.beginIf("spotEffect > light.cutoff")
-                .l("lightEffect = attenuation * calcPBRLight(light.color, light.intensity, position, lightDir, normal, view, material) * pow(spotEffect, light.exponent);")
+        code.beginIf("spot_alfa > light.cutoff")
+                .l("color = computePointLight(light.pl, position, normal)")
+                .l("color *= (1.0 - (1.0 - spot_alfa)/(1.0 - light.cutoff))")
                 .endIf();
 
-        code.l("return lightEffect;")
-                .endFunction();
-        return code;
+        code.l("return color");
+
+        return code.endFunction();
     }
 
     public static ShaderCode computeShadow(ShaderCode code) {
@@ -314,7 +309,7 @@ public class ShaderProgramPBR extends ShaderProgram {
 
         if (maxSpotLights > 0) {
             code.beginFor("int i = 0", "i < maxSpotLights", "i++")
-                    .l("accumLight += computeSpotLightPBR(spotLights[i], vPos, vNorm, vViewDir, material).rgb;")
+                    .l("accumLight += computeSpotLightPBR(spotLights[i], vPos, vNorm).rgb;")
                     .endFor();
         }
 

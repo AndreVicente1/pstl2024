@@ -84,12 +84,13 @@ public class Material {
         this.opacity = opacity;
     }
 
-    public Material(Vector3f baseColor, boolean withShadows, float metallic, float roughness, boolean isMetal, Texture metallicRoughnessTexture, Texture normalTexture, Texture emissiveTexture) {
+    public Material(Vector3f baseColor, boolean withShadows, float metallic, float roughness, boolean isMetal, Texture baseColorTexture,Texture metallicRoughnessTexture, Texture normalTexture, Texture emissiveTexture) {
         this.baseColor = baseColor;
         this.withShadows= withShadows;
         this.metallic= metallic;
         this.roughness= roughness;
         this.isMetal= isMetal;
+        this.texture = baseColorTexture;
         this.metallicRoughnessTexture= metallicRoughnessTexture;
         this.normalTexture= normalTexture;
         this.emissiveTexture= emissiveTexture;

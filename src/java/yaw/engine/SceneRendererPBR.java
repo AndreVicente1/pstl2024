@@ -7,6 +7,7 @@ import yaw.engine.light.LightModel;
 import yaw.engine.mesh.Material;
 import yaw.engine.mesh.Mesh;
 import yaw.engine.shader.ShaderManager;
+import yaw.engine.shader.ShaderProgramADS;
 import yaw.engine.shader.ShaderProgramPBR;
 import yaw.engine.shader.ShaderProperties;
 

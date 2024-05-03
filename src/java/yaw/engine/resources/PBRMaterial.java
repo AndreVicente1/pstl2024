@@ -7,7 +7,6 @@ import yaw.engine.mesh.Texture;
 public class PBRMaterial {
 
     private String name;
-    public String basecolor;
     public float metallic;
     public float roughness;
     public boolean isMetal;
@@ -16,6 +15,7 @@ public class PBRMaterial {
     public String metallicRoughnessTexture;
     public String normalTexture;
     public String emissiveTexture;
+    public String basecolorTexture;
 
     public PBRMaterial(String name) {
         this.name = name;
@@ -26,10 +26,10 @@ public class PBRMaterial {
     public String toString() {
         return "PBRMaterial{" +
                 "name='" + name + '\'' +
-                ", basecolor='" + basecolor + '\'' +
                 ", metallic=" + metallic +
                 ", roughness=" + roughness +
                 ", isMetal=" + isMetal +
+                ", basecolor='" + basecolorTexture + '\'' +
                 ", metallicRoughnessTexture='" + metallicRoughnessTexture + '\'' +
                 ", normalTexture='" + normalTexture + '\'' +
                 ", emissiveTexture='" + emissiveTexture + '\'' +
@@ -43,6 +43,7 @@ public class PBRMaterial {
                 metallic,
                 roughness,
                 isMetal,
+                basecolorTexture == null ? null : new Texture("/resources/" + basecolorTexture),
                 metallicRoughnessTexture == null ? null : new Texture("/resources/" + metallicRoughnessTexture),
                 normalTexture == null ? null : new Texture("/resources/" + normalTexture),
                 emissiveTexture == null ? null : new Texture("/resources/" + emissiveTexture)
