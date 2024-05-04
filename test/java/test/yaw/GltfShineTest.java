@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class GltfLoaderTest implements UpdateCallback {
+public class GltfShineTest implements UpdateCallback {
     private int nbUpdates = 0;
     private double totalDeltaTime = 0.0;
     private static long deltaRefreshMillis = 1000;
@@ -25,7 +25,7 @@ public class GltfLoaderTest implements UpdateCallback {
     private Item obj;
     private float speed = 0.1f;
 
-    public GltfLoaderTest(Item obj) {
+    public GltfShineTest(Item obj) {
         this.obj = obj;
     }
 
@@ -63,14 +63,16 @@ public class GltfLoaderTest implements UpdateCallback {
         World world = new World(0, 0, 800, 600);
 
         Camera camera = new Camera();
-        camera.setPosition((new Vector3f(0, 5, 0)));
+        camera.setPosition((new Vector3f(3, -2, -2 )));
+        camera.setRotation((new Vector3f(-1, 0, 5)));
+        camera.translate(-5,-5,0);
         world.setCamera(camera);
 
         world.installScene(new SceneRenderer(new LightModel()));
-        world.getSceneLight().setDirectionalLight(new DirectionalLight(new Vector3f(1,1,1), 0.7f, new Vector3f(-1,-1,-1)));
+        world.getSceneLight().setDirectionalLight(new DirectionalLight(new Vector3f(1,1,1), 0.9f, new Vector3f(0,0,-1)));
         world.getSceneLight().setAmbientLight(new AmbientLight(0.3f));
         GltfLoader gltfLoader = new GltfLoader();
-        Path path = Paths.get("src/java/resources/models/Cake_Pop.gltf");
+        Path path = Paths.get("src/java/resources/models/Shine_Sprite.gltf");
         try {
             gltfLoader.loadGltf(path.toString());
 
