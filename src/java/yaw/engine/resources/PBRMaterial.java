@@ -7,6 +7,7 @@ import yaw.engine.mesh.Texture;
 public class PBRMaterial {
 
     private String name;
+    public Vector3f basecolor;
     public float metallic;
     public float roughness;
     public boolean isMetal;
@@ -16,6 +17,8 @@ public class PBRMaterial {
     public String normalTexture;
     public String emissiveTexture;
     public String basecolorTexture;
+
+
 
     public PBRMaterial(String name) {
         this.name = name;
@@ -37,8 +40,7 @@ public class PBRMaterial {
     }
 
     public Material getMaterial(boolean withShadows) {
-        Vector3f baseColor = new Vector3f(1.0f, 1.0f, 1.0f);
-        return new Material(baseColor,
+        return new Material(basecolor,
                 withShadows,
                 metallic,
                 roughness,

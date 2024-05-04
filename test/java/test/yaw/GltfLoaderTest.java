@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 import yaw.engine.SceneRenderer;
 import yaw.engine.UpdateCallback;
 import yaw.engine.World;
+import yaw.engine.camera.Camera;
 import yaw.engine.items.Item;
 import yaw.engine.items.ItemGroup;
 import yaw.engine.light.AmbientLight;
@@ -60,6 +61,12 @@ public class GltfLoaderTest implements UpdateCallback {
     public static void main(String[] args) {
 
         World world = new World(0, 0, 800, 600);
+        System.out.println(world.getCamera().getPosition());
+
+        Camera camera = new Camera();
+        camera.setPosition((new Vector3f(0, 3, 10)));
+        world.setCamera(camera);
+
         world.installScene(new SceneRenderer(new LightModel()));
         world.getSceneLight().setDirectionalLight(new DirectionalLight(new Vector3f(1,1,1), 0.7f, new Vector3f(-1,-1,-1)));
         world.getSceneLight().setAmbientLight(new AmbientLight(0.3f));

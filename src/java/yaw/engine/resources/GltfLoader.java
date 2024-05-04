@@ -3,6 +3,7 @@ package yaw.engine.resources;
 import de.javagl.jgltf.model.*;
 import de.javagl.jgltf.model.io.GltfModelReader;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
+import org.joml.Vector3f;
 import yaw.engine.geom.Geometry;
 import yaw.engine.mesh.Texture;
 
@@ -44,6 +45,7 @@ public class GltfLoader {
         material.metallic = model.getMetallicFactor();
         material.roughness = model.getRoughnessFactor();
         material.isMetal = material.metallic > 0.5;
+        material.basecolor = new Vector3f(model.getBaseColorFactor());
 
         TextureModel baseColorTexture = model.getBaseColorTexture();
         if (baseColorTexture != null) {

@@ -170,4 +170,5 @@ public class Material {
         return emissiveTexture;
     }
 
+    public boolean getIsMetal() { return isMetal; }
 }

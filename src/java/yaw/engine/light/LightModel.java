@@ -54,8 +54,9 @@ public class LightModel {
      */
     public void setupShader(Matrix4f viewMatrix, ShaderProgram shaderProgram) {
         shaderProgram.bind();
-        shaderProgram.setUniform("ambientLight", ambientLight);
-
+        if (shaderProgram instanceof ShaderProgramADS) {
+            shaderProgram.setUniform("ambientLight", ambientLight);
+        }
         // Process Point Lights
         for (int i = 0; i < nbPointLights; i++) {
             // Get a copy of the point light object and transform its position to view coordinates
