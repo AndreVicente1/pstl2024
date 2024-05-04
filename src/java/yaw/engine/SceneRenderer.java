@@ -6,7 +6,11 @@ import yaw.engine.camera.Camera;
 import yaw.engine.items.ItemObject;
 import yaw.engine.light.LightModel;
 import yaw.engine.mesh.Mesh;
-import yaw.engine.shader.*;
+import yaw.engine.shader.ShaderManager;
+import yaw.engine.shader.ShaderProgram;
+import yaw.engine.shader.ShaderProgramADS;
+import yaw.engine.shader.ShaderProperties;
+import yaw.engine.shader.ShaderProgramPBR;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -116,8 +120,6 @@ public class SceneRenderer {
                     meshProgram.init();
                 }
             }
-
-
             /* Setup lights */
             lightModel.setupShader(new Matrix4f().identity(), meshProgram);
 
