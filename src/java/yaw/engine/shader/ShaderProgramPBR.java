@@ -188,7 +188,7 @@ public class ShaderProgramPBR extends ShaderProgram {
                     .item("float", "att_quadratic")
                     .endStruct()
                     .l("uniform PointLight pointLights[MAX_POINT_LIGHTS]")
-                    .l("uniform int numPointLights");
+                    .l("uniform int nbPointLights");
         }
 
         if (maxSpotLights > 0) {
@@ -198,7 +198,7 @@ public class ShaderProgramPBR extends ShaderProgram {
                     .item("float", "cutoff")
                     .endStruct()
                     .l("uniform SpotLight spotLights[MAX_SPOT_LIGHTS]")
-                    .l("uniform int numSpotLights");
+                    .l("uniform int nbSpotLights");
         }
 
         if (withShadows) {
@@ -216,14 +216,14 @@ public class ShaderProgramPBR extends ShaderProgram {
         }
 
         if (maxPointLights > 0) {
-            code.beginFor("int i = 0", "i < numPointLights", "i++")
+            code.beginFor("int i = 0", "i < nbPointLights", "i++")
                     .l("vec3 pointLightEffect = calcPBRLight(pointLights[i].base, vPos, 0, vNorm, material);")
                     .l("accumLight += pointLightEffect;")
                     .endFor();
         }
 
         if (maxSpotLights > 0) {
-            code.beginFor("int i = 0", "i < numSpotLights", "i++")
+            code.beginFor("int i = 0", "i < nbSpotLights", "i++")
                     .l("vec3 spotLightEffect = calcPBRLight(spotLights[i].pl.base, vPos, 0, vNorm, material);")
                     .l("accumLight += spotLightEffect;")
                     .endFor();
