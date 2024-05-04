@@ -101,9 +101,7 @@ public class SceneRenderer {
             ShaderProgram meshProgram;
             if (mesh.isPBR()) {
                 meshProgram = shaderManager.fetch(meshProps);
-                //System.out.println("meshProgram : "+meshProgram);
                 if (meshProgram == null) {
-                    // create a shader program for this scene / mesh
                     meshProgram = new ShaderProgramPBR(meshProps);
                     shaderManager.register(meshProps, meshProgram);
                     meshProgram.init();
@@ -189,8 +187,5 @@ public class SceneRenderer {
 
     public LightModel getLightModel() {
         return lightModel;
-    }
-    public ArrayList<Mesh> getNotInit() {
-        return notInit;
     }
 }
