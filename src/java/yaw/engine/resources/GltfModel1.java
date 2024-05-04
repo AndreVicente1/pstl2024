@@ -57,7 +57,7 @@ public class GltfModel1 {
             String materialName = materialAssignments.get(geometryName);
             Material mat = materials.get(materialName).getMaterial(withShadows);
 
-            Mesh mesh = new Mesh(geom, mat);
+            Mesh mesh = new Mesh(geom, mat,true);
             meshes.add(mesh);
         }
         return meshes.toArray(new Mesh[0]);

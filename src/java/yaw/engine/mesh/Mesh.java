@@ -47,23 +47,27 @@ public class Mesh {
     private MeshDrawingStrategy drawingStrategy;
     private boolean drawADS;
 
+    private boolean isPBR;
     /**
      * Construct a Mesh
      *
      * @param geometry    The Geometry of the Mesh
      * @param material    The Material of the Mesh
      */
-    public Mesh(Geometry geometry, Material material) {
+    public Mesh(Geometry geometry, Material material, boolean isPBR) {
         this.geometry = geometry;
         this.material = material;
         this.attributes = new HashMap<>();
         this.vboIdList = new ArrayList<>();
         this.drawADS = false;
         drawingStrategy = new DefaultDrawingStrategy();
+        this.isPBR = isPBR;
     }
-
+    public Mesh(Geometry geometry, Material material) {
+        this(geometry, material, false);
+    }
     public Mesh(Geometry geometry) {
-        this(geometry, new Material());
+        this(geometry, new Material(), false);
     }
 
     public ShaderProperties getShaderProperties(LightModel lightModel) {
@@ -132,24 +136,17 @@ public class Mesh {
 
     }
 
-    public void renderSetup(Camera pCamera, ShaderProgramADS shaderProgram) {
+    public void renderSetup(Camera pCamera, ShaderProgram shaderProgram) {
         initRender();
         shaderProgram.bind();
         /* Set the camera to render. */
         shaderProgram.setUniform("worldMatrix", pCamera.getWorldMat());
         shaderProgram.setUniform("camera_pos", pCamera.getPosition());
-
-        shaderProgram.setUniform("material", material);
-    }
-
-    public void renderSetup(Camera pCamera, ShaderProgramPBR shaderProgram) {
-        initRender();
-        shaderProgram.bind();
-        /* Set the camera to render. */
-        shaderProgram.setUniform("worldMatrix", pCamera.getWorldMat());
-        shaderProgram.setUniform("camera_pos", pCamera.getPosition());
-
-        shaderProgram.setUniform("material", material);
+        if (isPBR) {
+            ((ShaderProgramPBR)shaderProgram).setUniform("material", material);
+        } else {
+            ((ShaderProgramADS)shaderProgram).setUniform("material", material);
+        }
     }
 
     public void renderItem(ItemObject item, ShaderProgram shaderProgram) {
@@ -390,5 +387,9 @@ public class Mesh {
 
     public Geometry getGeometry() {
         return geometry;
+    }
+
+    public boolean isPBR() {
+        return isPBR;
     }
 }

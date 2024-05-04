@@ -1,6 +1,7 @@
 package test.yaw;
 
 import org.joml.Vector3f;
+import yaw.engine.SceneRenderer;
 import yaw.engine.UpdateCallback;
 import yaw.engine.World;
 import yaw.engine.items.Item;
@@ -9,7 +10,6 @@ import yaw.engine.light.AmbientLight;
 import yaw.engine.light.DirectionalLight;
 import yaw.engine.light.LightModel;
 import yaw.engine.mesh.Mesh;
-import yaw.engine.SceneRendererPBR;
 import yaw.engine.resources.GltfLoader;
 
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class GltfLoaderTest implements UpdateCallback {
     public static void main(String[] args) {
 
         World world = new World(0, 0, 800, 600);
-        world.installScene(new SceneRendererPBR(new LightModel()));
+        world.installScene(new SceneRenderer(new LightModel()));
         world.getSceneLight().setDirectionalLight(new DirectionalLight(new Vector3f(1,1,1), 0.7f, new Vector3f(-1,-1,-1)));
         world.getSceneLight().setAmbientLight(new AmbientLight(0.3f));
         GltfLoader gltfLoader = new GltfLoader();

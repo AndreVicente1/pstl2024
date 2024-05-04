@@ -6,10 +6,7 @@ import yaw.engine.camera.Camera;
 import yaw.engine.items.ItemObject;
 import yaw.engine.light.LightModel;
 import yaw.engine.mesh.Mesh;
-import yaw.engine.shader.ShaderManager;
-import yaw.engine.shader.ShaderProgram;
-import yaw.engine.shader.ShaderProgramADS;
-import yaw.engine.shader.ShaderProperties;
+import yaw.engine.shader.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,15 +98,28 @@ public class SceneRenderer {
 
         for (Mesh mesh : mMeshMap.keySet()) {
             ShaderProperties meshProps = mesh.getShaderProperties(lightModel);
-            // TODO : ugly cast, fix when support for e.g. PBR materials
-            ShaderProgramADS meshProgram = (ShaderProgramADS) shaderManager.fetch(meshProps);
-            if (meshProgram == null) {
-                // create a shader program for this scene / mesh
-                meshProgram = new ShaderProgramADS(meshProps);
-                shaderManager.register(meshProps, meshProgram);
-                meshProgram.prepareMaterial(mesh.getMaterial());
-                meshProgram.init();
+            ShaderProgram meshProgram;
+            if (mesh.isPBR()) {
+                meshProgram = shaderManager.fetch(meshProps);
+                //System.out.println("meshProgram : "+meshProgram);
+                if (meshProgram == null) {
+                    // create a shader program for this scene / mesh
+                    meshProgram = new ShaderProgramPBR(meshProps);
+                    shaderManager.register(meshProps, meshProgram);
+                    meshProgram.init();
+                }
+            }else{
+                meshProgram = shaderManager.fetch(meshProps);
+                if (meshProgram == null) {
+                    // create a shader program for this scene / mesh
+                    meshProgram = new ShaderProgramADS(meshProps);
+                    shaderManager.register(meshProps, meshProgram);
+                    ((ShaderProgramADS) meshProgram).prepareMaterial(mesh.getMaterial());
+                    meshProgram.init();
+                }
             }
+
+
             /* Setup lights */
             lightModel.setupShader(new Matrix4f().identity(), meshProgram);
 

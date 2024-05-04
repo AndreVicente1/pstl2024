@@ -94,7 +94,7 @@ public class ObjModel {
             mat = new Material();
             mat.setColor(new Vector3f(0.1f , 0.7f, 0.9f));
             */
-            Mesh mesh = new Mesh(geom, mat);
+            Mesh mesh = new Mesh(geom, mat,false);
             meshes.add(mesh);
         }
         Mesh[] witness = new Mesh[1];
