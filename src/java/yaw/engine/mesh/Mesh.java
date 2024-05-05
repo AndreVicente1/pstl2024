@@ -8,6 +8,7 @@ import yaw.engine.geom.Geometry;
 import yaw.engine.items.ItemObject;
 import yaw.engine.light.LightModel;
 import yaw.engine.mesh.strategy.DefaultDrawingStrategy;
+import yaw.engine.resources.MtlMaterial;
 import yaw.engine.shader.ShaderProgram;
 import yaw.engine.shader.ShaderProgramADS;
 import yaw.engine.shader.ShaderProgramPBR;
@@ -67,7 +68,7 @@ public class Mesh {
         this(geometry, material, false);
     }
     public Mesh(Geometry geometry) {
-        this(geometry, new Material(), false);
+        this(geometry, new MaterialADS(), false);
     }
 
     public ShaderProperties getShaderProperties(LightModel lightModel) {
@@ -75,7 +76,8 @@ public class Mesh {
                 lightModel.maxPointLights,
                 lightModel.maxSpotLights,
                 material.isTextured(),
-                material.withShadows && lightModel.hasDirectionalLight);
+                material.withShadows && lightModel.hasDirectionalLight,
+                isPBR);
     }
 
     /**
@@ -142,11 +144,7 @@ public class Mesh {
         /* Set the camera to render. */
         shaderProgram.setUniform("worldMatrix", pCamera.getWorldMat());
         shaderProgram.setUniform("camera_pos", pCamera.getPosition());
-        if (isPBR) {
-            ((ShaderProgramPBR)shaderProgram).setUniform("material", material);
-        } else {
-            ((ShaderProgramADS)shaderProgram).setUniform("material", material);
-        }
+        shaderProgram.setUniform("material", material);
     }
 
     public void renderItem(ItemObject item, ShaderProgram shaderProgram) {
@@ -257,6 +255,11 @@ public class Mesh {
         if (texture6 != null) {
             texture6.cleanup();
         }
+
+        Texture texture7 = material.getOcclusionTexture();
+        if (texture7 != null) {
+            texture7.cleanup();
+        }
         // Delete the VAO
         glBindVertexArray(0);
         glDeleteVertexArrays(vaoId);
@@ -355,6 +358,11 @@ public class Mesh {
             glActiveTexture(GL_TEXTURE5);
             emissive.bind();
         }
+
+        Texture texture7 = material != null ? material.getOcclusionTexture() : null;
+        if (texture7 != null) {
+            texture7.init();
+        }
         // Draw the mesh
         glBindVertexArray(vaoId);
         glEnableVertexAttribArray(0);
@@ -387,9 +395,5 @@ public class Mesh {
 
     public Geometry getGeometry() {
         return geometry;
-    }
-
-    public boolean isPBR() {
-        return isPBR;
     }
 }

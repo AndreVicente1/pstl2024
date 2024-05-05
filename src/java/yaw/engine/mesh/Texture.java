@@ -49,7 +49,6 @@ public class Texture {
             try {
                 lInputStream = Texture.class.getResourceAsStream(mFileName);
                 // Load Texture file
-                System.out.println("Loading texture: " + mFileName);
                 PNGDecoder mDecoder = new PNGDecoder(lInputStream);
 
                 this.mWidth = mDecoder.getWidth();

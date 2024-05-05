@@ -8,6 +8,7 @@ import yaw.engine.items.ItemObject;
 import yaw.engine.light.LightModel;
 import yaw.engine.light.SpotLight;
 import yaw.engine.mesh.Material;
+import yaw.engine.mesh.MaterialADS;
 import yaw.engine.mesh.Mesh;
 
 /**
@@ -32,7 +33,7 @@ public class CameraTest implements UpdateCallback {
         //world.getSceneLight().setSun(new DirectionalLight());
 
         Mesh cubem = MeshExamples.makeDice(1);
-        cubem.setMaterial(new Material(new Vector3f(0, 0, 7.0f)));
+        cubem.setMaterial(new MaterialADS(new Vector3f(0, 0, 7.0f)));
         cube = world.createItemObject("cube", 0f, 0, 0, 1.0f, cubem);
 
         world.registerUpdateCallback(this);

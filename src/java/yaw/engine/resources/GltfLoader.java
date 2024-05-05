@@ -5,7 +5,6 @@ import de.javagl.jgltf.model.io.GltfModelReader;
 import de.javagl.jgltf.model.v2.MaterialModelV2;
 import org.joml.Vector3f;
 import yaw.engine.geom.Geometry;
-import yaw.engine.mesh.Texture;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -33,19 +32,21 @@ public class GltfLoader {
         System.out.println("Processing materials...");
         if (model.getMaterialModels() != null) {
             for (MaterialModel materialModel : model.getMaterialModels()) {
-                PBRMaterial pbrMaterial = convertToPBRMaterial(materialModel);
-                gltfModel.addMaterial(materialModel.getName(), pbrMaterial);
+                GltfMaterial gltfMaterial = convertToPBRMaterial(materialModel);
+                gltfModel.addMaterial(materialModel.getName(), gltfMaterial);
             }
         }
     }
-    private PBRMaterial convertToPBRMaterial(MaterialModel materialModel) {
-        PBRMaterial material = new PBRMaterial(materialModel.getName());
+    private GltfMaterial convertToPBRMaterial(MaterialModel materialModel) {
+        GltfMaterial material = new GltfMaterial(materialModel.getName());
         MaterialModelV2 model = (MaterialModelV2) materialModel;
+
 
         material.metallic = model.getMetallicFactor();
         material.roughness = model.getRoughnessFactor();
         material.isMetal = material.metallic > 0.5;
         material.basecolor = new Vector3f(model.getBaseColorFactor());
+        material.occlusionStrength = model.getOcclusionStrength();
 
         TextureModel baseColorTexture = model.getBaseColorTexture();
         if (baseColorTexture != null) {
@@ -66,7 +67,10 @@ public class GltfLoader {
         if (emissiveTexture != null) {
             material.emissiveTexture = cleanUri(emissiveTexture.getImageModel().getUri());
         }
-
+        TextureModel occlusionTexture = model.getOcclusionTexture();
+        if (occlusionTexture != null) {
+            material.occlusionTexture = cleanUri(occlusionTexture.getImageModel().getUri());
+        }
         return material;
     }
     //TODO : remove this method and change the Texture path

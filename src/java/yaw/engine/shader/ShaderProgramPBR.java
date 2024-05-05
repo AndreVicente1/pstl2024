@@ -3,6 +3,10 @@ package yaw.engine.shader;
 import org.joml.Vector3f;
 import yaw.engine.light.DirectionalLight;
 import yaw.engine.mesh.Material;
+import yaw.engine.mesh.MaterialPBR;
+
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
+import static org.lwjgl.opengl.GL20.glUniform1i;
 
 public class ShaderProgramPBR extends ShaderProgram {
     private final String glVersion;
@@ -150,10 +154,12 @@ public class ShaderProgramPBR extends ShaderProgram {
         // Material struct
         code.beginStruct("Material")
                 .item("sampler2D", "metallicRoughnessTexture")
+                .item("sampler2D", "occlusionTexture")
                 .item("sampler2D", "normalTexture")
                 .item("sampler2D", "emissiveTexture")
                 .item("float", "metallic")
                 .item("float", "roughness")
+                .item("float", "occlusionStrength")
                 .item("int", "isMetal");
 
         if (hasTexture)
@@ -182,10 +188,6 @@ public class ShaderProgramPBR extends ShaderProgram {
         code.beginStruct("PointLight")
                 .item("BaseLight", "base")
                 .item("vec3", "localPos")
-                //.item("vec3","worldPos")
-//                    .item("float", "att_constant")
-//                    .item("float", "att_linear")
-//                    .item("float", "att_quadratic")
                 .endStruct()
                 .l("uniform PointLight pointLights[MAX_POINT_LIGHTS]")
                 .l("uniform int nbPointLights");
@@ -203,13 +205,13 @@ public class ShaderProgramPBR extends ShaderProgram {
 
         // Uniforms
         code.l("uniform Material material")
-                //l("uniform vec3 ambientLight")
-                .l("uniform vec3 camera_pos");
+                .l("uniform vec3 camera_pos")
+                .l("uniform int useOcclusionMap");
 
         code = ggxDistribution(code);
-        code = schlickFresnel(code);
+        code = schlickFresnel(code, hasTexture);
         code = geomSmith(code);
-        code = calcPBRLight(code);
+        code = calcPBRLight(code, hasTexture);
 
         if (withShadows) {
             code.l("uniform sampler2D shadowMap")
@@ -220,17 +222,17 @@ public class ShaderProgramPBR extends ShaderProgram {
         code.beginMain()
                 .l("vec3 totalLight = vec3(0.0);");  // Accumulateur de lumière
 
-        //if (hasDirectionalLight) {
+        if (hasDirectionalLight) {
         code.l("vec3 lightEffect = calcPBRLight(directionalLight.base, directionalLight.direction, 1, vNorm, material, camera_pos, localPos0);")
                 .l("totalLight += lightEffect;");
-        //}
+        }
 
-        //if (maxPointLights > 0) {
+        if (maxPointLights > 0) {
         code.beginFor("int i = 0", "i < nbPointLights", "i++")
                 .l("vec3 pointLightEffect = calcPBRLight(pointLights[i].base, pointLights[i].localPos, 0, vNorm, material, camera_pos, localPos0);")
                 .l("totalLight += pointLightEffect;")
                 .endFor();
-        //}
+        }
 
         // pas de spotlights en pbr
         //if (maxSpotLights > 0) {
@@ -269,6 +271,7 @@ public class ShaderProgramPBR extends ShaderProgram {
         createUniform(uniformName + ".isMetal");
         createUniform(uniformName + ".metallic");
         createUniform(uniformName + ".roughness");
+        createUniform(uniformName + ".occlusionStrength");
     }
 
 
@@ -296,12 +299,19 @@ public class ShaderProgramPBR extends ShaderProgram {
             createUniform(uniformName + ".emissiveTexture");
             setUniform(uniformName + ".emissiveTexture", 3);
         }
+
+        if (material.hasOcclusionTexture()){
+            createUniform(uniformName + ".occlusionTexture");
+            setUniform(uniformName + ".occlusionTexture", 4);
+        }
+
         setUniform(uniformName + ".metallic", material.getMetallic());
         setUniform(uniformName + ".roughness", material.getRoughness());
+        setUniform(uniformName + ".occlusionStrength", material.getOcclusion());
         setUniform(uniformName + ".isMetal", material.getIsMetal() ? 1 : 0);
     }
 
-    public static ShaderCode calcPBRLight(ShaderCode code) {
+    public static ShaderCode calcPBRLight(ShaderCode code, boolean hasTexture) {
         code.function("Compute PBR-based direct lighting",
                 "vec3", "calcPBRLight",
                 new String[][]{{"BaseLight", "light"},
@@ -341,13 +351,29 @@ public class ShaderProgramPBR extends ShaderProgram {
                 .l("vec3 specBRDF = specBRDF_nom / specBRDF_denom;");
 
         code.l().l("vec3 flambert = vec3(0.0);");
-        code.beginIf("material.isMetal == 0")
-                .l("flambert = material.color;") //CHECKME: fix
-                .endIf();
+        code.beginIf("material.isMetal == 0");
+        if (hasTexture){
+            code.l("flambert = texture(material.baseColorTexture, vTexCoord).rgb");
+        } else {
+            code.l("flambert = material.color;"); //CHECKME: fix
+        }
+        code.endIf();
+
+        code.l("vec3 finalAmbient = vec3(1.0);");
+        code.beginIf("useOcclusionMap == 1");
+        code.l(" vec3 ambientOcclusion = texture(material.occlusionTexture, vTexCoord).rgb * material.occlusionStrength;")
+            .l("vec3 ambientLight = light.ambientIntensity * ambientOcclusion;");
+        code.l().l("vec3 finalAmbient = ambientLight * flambert;");
+        code.endIf();
+        code.beginElse()
+            .l("float ambientLight = light.ambientIntensity * material.occlusionStrength;");
+        code.l().l("vec3 finalAmbient = ambientLight * flambert;");
+        code.endElse();
+
 
         //TODO: #define PI 3.1415926535897932384626433832795
         code.l().l("vec3 diffuseBRDF = kD * flambert / 3.1415926535897932384626433832795;")
-                .l("vec3 finalColor = (diffuseBRDF + specBRDF) * lightIntensity * nDotL;");
+                .l("vec3 finalColor = finalAmbient * (diffuseBRDF + specBRDF) * lightIntensity * nDotL;");
 
         code.l().l("return finalColor;");
 
@@ -380,15 +406,19 @@ public class ShaderProgramPBR extends ShaderProgram {
         return code.endFunction();
     }
 
-    public static ShaderCode schlickFresnel(ShaderCode code){
+    public static ShaderCode schlickFresnel(ShaderCode code, boolean hasTexture){
         code.function("Schlick's approximation for Fresnel effect",
                 "vec3", "schlickFresnel",
                 new String[][]{{"float", "vDotH"},
                         {"Material","material"}});
 
         code.l().l("vec3 f0 = vec3(0.04);"); // actual F0 for the metals
-        code.l().beginIf("material.isMetal == 1")
-                .l("f0 = material.color;"); //FIXME: fix
+        code.l().beginIf("material.isMetal == 1");
+        if (hasTexture){
+            code.l("f0 = texture(material.baseColorTexture, vTexCoord).rgb");
+        } else {
+            code.l("f0 = material.color;"); //FIXME: fix
+        }
         code.endIf();
 
         code.l().l("vec3 ret = f0 + (1 - f0) * pow(clamp(1.0 - vDotH, 0.0, 1.0), 5);")
@@ -414,10 +444,6 @@ public class ShaderProgramPBR extends ShaderProgram {
         createBaseLightUniform(uniformName + ".base");
 
         createUniform(uniformName + ".localPos");
-        //createUniform(uniformName + ".worldPos");
-//        createUniform(uniformName + ".att_constant");
-//        createUniform(uniformName + ".att_linear");
-//        createUniform(uniformName + ".att_quadratic");
     }
 
     public void createPointLightListUniform(String uniformName, int size) {
@@ -432,6 +458,15 @@ public class ShaderProgramPBR extends ShaderProgram {
         setUniform(uniformName + ".base.diffuseIntensity", dirLight.getIntensity());
     }
 
+    public void prepareMaterial(Material material) {
+        if (material.hasOcclusionTexture()) {
+            glUniform1i(glGetUniformLocation(this.getId(), "useOcclusionMap"), 1);
+        } else {
+            glUniform1i(glGetUniformLocation(this.getId(), "useOcclusionMap"), 0);
+        }
+
+    }
+
     public void init() {
         /* Initialization of the shader program. */
         ShaderCode vertexCode = vertexShader(shaderProperties.withShadows);
@@ -443,7 +478,7 @@ public class ShaderProgramPBR extends ShaderProgram {
                 shaderProperties.maxSpotLights,
                 shaderProperties.hasTexture,
                 shaderProperties.withShadows);
-        //System.out.println("Fragment shader:\n" + fragmentCode);
+        System.out.println("Fragment shader:\n" + fragmentCode);
         createFragmentShader(fragmentCode);
 
         /* Binds the code and checks that everything has been done correctly. */

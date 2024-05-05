@@ -14,7 +14,7 @@ public class GltfModel1 {
     private Map<String, Geometry> geometries;
     private List<String> geometryNames;
 
-    private Map<String, PBRMaterial> materials;
+    private Map<String, GltfMaterial> materials;
     private List<String> materialNames;
     private Map<String, String> materialAssignments;
 
@@ -35,7 +35,7 @@ public class GltfModel1 {
         geometryNames.add(name);
     }
 
-    public void addMaterial(String name, PBRMaterial material) {
+    public void addMaterial(String name, GltfMaterial material) {
         if (materials.containsKey(name)) {
             throw new IllegalStateException("Material already exists: " + name);
         }

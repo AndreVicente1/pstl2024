@@ -13,12 +13,15 @@ public class ShaderProperties {
 
     public final boolean withShadows;
 
-    public ShaderProperties(boolean hasDirectionalLight, int maxPointLights, int maxSpotLights, boolean hasTexture, boolean withShadows) {
+    public final boolean isPBR;
+
+    public ShaderProperties(boolean hasDirectionalLight, int maxPointLights, int maxSpotLights, boolean hasTexture, boolean withShadows, boolean isPBR) {
         this.hasDirectionalLight = hasDirectionalLight;
         this.maxPointLights = maxPointLights;
         this.maxSpotLights = maxSpotLights;
         this.hasTexture = hasTexture;
         this.withShadows = withShadows;
+        this.isPBR = isPBR;
     }
 
     @Override

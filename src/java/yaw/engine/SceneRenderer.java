@@ -103,23 +103,18 @@ public class SceneRenderer {
         for (Mesh mesh : mMeshMap.keySet()) {
             ShaderProperties meshProps = mesh.getShaderProperties(lightModel);
             ShaderProgram meshProgram;
-            if (mesh.isPBR()) {
-                meshProgram = shaderManager.fetch(meshProps);
-                if (meshProgram == null) {
+            meshProgram = shaderManager.fetch(meshProps);
+            if(meshProgram == null){
+                if (meshProps.isPBR) {
                     meshProgram = new ShaderProgramPBR(meshProps);
-                    shaderManager.register(meshProps, meshProgram);
-                    meshProgram.init();
-                }
-            }else{
-                meshProgram = shaderManager.fetch(meshProps);
-                if (meshProgram == null) {
-                    // create a shader program for this scene / mesh
+                } else {
                     meshProgram = new ShaderProgramADS(meshProps);
-                    shaderManager.register(meshProps, meshProgram);
-                    ((ShaderProgramADS) meshProgram).prepareMaterial(mesh.getMaterial());
-                    meshProgram.init();
                 }
+                shaderManager.register(meshProps, meshProgram);
+                meshProgram.prepareMaterial(mesh.getMaterial());
+                meshProgram.init();
             }
+
             /* Setup lights */
             lightModel.setupShader(new Matrix4f().identity(), meshProgram);
 

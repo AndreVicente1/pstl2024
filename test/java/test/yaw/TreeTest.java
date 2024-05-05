@@ -9,6 +9,7 @@ import yaw.engine.items.ItemObject;
 import yaw.engine.light.DirectionalLight;
 import yaw.engine.light.LightModel;
 import yaw.engine.mesh.Material;
+import yaw.engine.mesh.MaterialADS;
 import yaw.engine.mesh.Mesh;
 import yaw.engine.mesh.DeprecatedMeshBuilder;
 import yaw.engine.mesh.strategy.DefaultDrawingStrategy;
@@ -130,7 +131,7 @@ public class TreeTest implements UpdateCallback {
 
         Mesh treem = new Mesh(new Geometry(nvs, null, null, nis));
         treem.setDrawingStrategy(new DefaultDrawingStrategy());
-        Material mat = new Material(new Vector3f(0,1,0));
+        Material mat = new MaterialADS(new Vector3f(0,1,0));
         treem.setMaterial(mat);
 
         return treem;

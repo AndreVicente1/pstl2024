@@ -2,6 +2,7 @@ package yaw.engine.resources;
 
 import org.joml.Vector3f;
 import yaw.engine.mesh.Material;
+import yaw.engine.mesh.MaterialADS;
 import yaw.engine.mesh.Texture;
 
 import static org.joml.Math.clamp;
@@ -40,7 +41,7 @@ public class MtlMaterial {
     public Material getMaterial(boolean withShadows) {
         // XXX : MTL has no notion of a "basic color"
         Vector3f baseColor = new Vector3f(1.0f, 1.0f, 1.0f);
-        return new Material(baseColor,
+        return new MaterialADS(baseColor,
                 ambient == null ? baseColor : ambient,
                 emissive == null ? new Vector3f(0, 0, 0) : emissive,
                 emissive == null ? 0 : 1.0f,

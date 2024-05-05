@@ -40,7 +40,7 @@ public class DeprecatedMeshBuilder {
         /*Warning default reflectance*/
         Material lMaterial = null;
         try {
-            lMaterial = new Material(new Vector3f(cx, cy, cz));
+            lMaterial = new MaterialADS(new Vector3f(cx, cy, cz));
         } catch (Exception pE) {
             pE.printStackTrace();
         }
@@ -160,7 +160,7 @@ public class DeprecatedMeshBuilder {
                 16, 19, 18, 16, 17, 19,
                 //Right face
                 20, 22, 21, 22, 23, 21};
-        Mesh lMesh = new Mesh(new Geometry(vertices, textCoord, normals, indices), new Material());
+        Mesh lMesh = new Mesh(new Geometry(vertices, textCoord, normals, indices), new MaterialADS());
         lMesh.setDrawingStrategy(new DefaultDrawingStrategy());
         Map<String, String> lOptionalAttributes = DeprecatedMeshBuilder.getPositionAttributesMap(xLength, yLength, zLength);
         lMesh.putOptionalAttributes(lOptionalAttributes);

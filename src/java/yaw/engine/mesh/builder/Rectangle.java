@@ -3,6 +3,7 @@ package yaw.engine.mesh.builder;
 import yaw.engine.geom.Geometry;
 import yaw.engine.mesh.DeprecatedMeshBuilder;
 import yaw.engine.mesh.Material;
+import yaw.engine.mesh.MaterialADS;
 import yaw.engine.mesh.Mesh;
 import yaw.engine.mesh.strategy.DefaultDrawingStrategy;
 
@@ -58,7 +59,7 @@ public class Rectangle implements MeshBuilder {
 
         //mapping the triangle for each face
         int[] indices = new int[] {0, 1, 2, 0, 2, 3};
-        Mesh lMesh = new Mesh(new Geometry(vertices, textCoord, normals, indices), new Material());
+        Mesh lMesh = new Mesh(new Geometry(vertices, textCoord, normals, indices), new MaterialADS());
         lMesh.setDrawingStrategy(new DefaultDrawingStrategy());
         Map<String, String> lOptionalAttributes = DeprecatedMeshBuilder.getPositionAttributesMap(xLength, yLength, 0);
         lMesh.putOptionalAttributes(lOptionalAttributes);

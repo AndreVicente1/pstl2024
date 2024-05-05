@@ -407,4 +407,14 @@ public abstract class ShaderProgram {
         return mProgramId;
     }
 
+    /**
+     * Delegates the method according to the material type
+     * @param name the material name
+     * @param material the material (ADS or PBR)
+     */
+    public void setUniform(String name, Material material) {
+    }
+
+    public void prepareMaterial(Material material) {
+    }
 }
