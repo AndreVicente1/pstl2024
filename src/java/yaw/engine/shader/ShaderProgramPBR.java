@@ -478,7 +478,7 @@ public class ShaderProgramPBR extends ShaderProgram {
                 shaderProperties.maxSpotLights,
                 shaderProperties.hasTexture,
                 shaderProperties.withShadows);
-        System.out.println("Fragment shader:\n" + fragmentCode);
+        //System.out.println("Fragment shader:\n" + fragmentCode);
         createFragmentShader(fragmentCode);
 
         /* Binds the code and checks that everything has been done correctly. */
