@@ -109,7 +109,7 @@ public class GltfLoader {
         int[] indices = indexAccessor != null ? extractIntData(indexAccessor.getAccessorData()) : new int[0];
 
         System.out.println("Vertices: " + vertices.length + " Normals: " + normals.length + " TexCoords: " + textCoords.length + " Indices: " + indices.length);
-        return new Geometry(vertices, textCoords, normals, indices);
+            return new Geometry(vertices, textCoords, normals, indices);
     }
     private int[] extractIntData(AccessorData accessorData) {
         if (accessorData instanceof AccessorIntData) {

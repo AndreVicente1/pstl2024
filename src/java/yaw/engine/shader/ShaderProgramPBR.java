@@ -122,7 +122,7 @@ public class ShaderProgramPBR extends ShaderProgram {
         return code;
     }
 
-    public ShaderCode fragmentShader(boolean hasDirectionalLight, int maxPointLights, int maxSpotLights, boolean hasTexture, boolean withShadows) {
+    public ShaderCode fragmentShader(boolean hasDirectionalLight, int maxPointLights, boolean hasTexture, boolean withShadows) {
         ShaderCode code = new ShaderCode(glVersion, glCoreProfile)
                 .cmt("Fragment shader for Physically Based Rendering")
                 .l();
@@ -130,11 +130,6 @@ public class ShaderProgramPBR extends ShaderProgram {
         if (maxPointLights > 0) {
             code.l("const int MAX_POINT_LIGHTS = " + maxPointLights);
         }
-        if (maxSpotLights > 0) {
-            code.l("const int MAX_SPOT_LIGHTS = " + maxSpotLights);
-        }
-
-        //TODO: verifier LocalPos0 et cameraPos + occlusion Text pour les shadows
 
         code.l("in vec3 vPos")
                 .l("in vec2 vTexCoord")
@@ -164,9 +159,8 @@ public class ShaderProgramPBR extends ShaderProgram {
 
         if (hasTexture)
             code.item("sampler2D", "baseColorTexture");
-        //} else {
+
         code.item("vec3","color");
-        //}
         code.endStruct()
                 .l();
 
@@ -176,32 +170,22 @@ public class ShaderProgramPBR extends ShaderProgram {
                 .item("float", "diffuseIntensity")
                 .endStruct();
 
-        // (hasDirectionalLight) {
+        if (hasDirectionalLight) {
         code.beginStruct("DirectionalLight")
                 .item("BaseLight", "base")
                 .item("vec3", "direction")
                 .endStruct()
                 .l("uniform DirectionalLight directionalLight");
-        //}
+        }
 
-        //if (maxPointLights > 0) {
+        if (maxPointLights > 0) {
         code.beginStruct("PointLight")
                 .item("BaseLight", "base")
                 .item("vec3", "localPos")
                 .endStruct()
                 .l("uniform PointLight pointLights[MAX_POINT_LIGHTS]")
                 .l("uniform int nbPointLights");
-        //}
-
-        //if (maxSpotLights > 0) {
-        code.beginStruct("SpotLight")
-                .item("PointLight", "pl")
-                .item("vec3", "conedir")
-                .item("float", "cutoff")
-                .endStruct()
-                .l("uniform SpotLight spotLights[MAX_SPOT_LIGHTS]")
-                .l("uniform int nbSpotLights");
-        //}
+        }
 
         // Uniforms
         code.l("uniform Material material")
@@ -233,14 +217,6 @@ public class ShaderProgramPBR extends ShaderProgram {
                 .l("totalLight += pointLightEffect;")
                 .endFor();
         }
-
-        // pas de spotlights en pbr
-        //if (maxSpotLights > 0) {
-//            code.beginFor("int i = 0", "i < nbSpotLights", "i++")
-//                    .l("vec3 spotLightEffect = calcPBRLight(spotLights[i].pl.base, vPos, 0, vNorm, material, camera_pos, localPos0);")
-//                    .l("accumLight += spotLightEffect;")
-//                    .endFor();
-        //}
 
         // HDR tone mapping
         code.l("totalLight = totalLight / (totalLight + vec3(1.0));");
@@ -327,14 +303,14 @@ public class ShaderProgramPBR extends ShaderProgram {
         code.beginIf("isDirLight == 1")
                 .l("l = -posDir.xyz;");
         code.endIf().beginElse()
-                .l("l = posDir - localPos0;") //CHECKME
+                .l("l = posDir - localPos0;")
                 .l("float lightToPixelDist = length(l);")
                 .l("l = normalize(l);")
                 .l("lightIntensity /= (lightToPixelDist * lightToPixelDist);");
         code.endElse();
 
         code.l().l("vec3 n = normal")
-                .l("vec3 v = normalize(gCameraLocalPos - localPos0);") //CHECKME
+                .l("vec3 v = normalize(gCameraLocalPos - localPos0);")
                 .l("vec3 h = normalize(v + l);");
 
         code.l().l("float nDotH = max(dot(n, h), 0.0);")
@@ -355,7 +331,7 @@ public class ShaderProgramPBR extends ShaderProgram {
         if (hasTexture){
             code.l("flambert = texture(material.baseColorTexture, vTexCoord).rgb");
         } else {
-            code.l("flambert = material.color;"); //CHECKME: fix
+            code.l("flambert = material.color;");
         }
         code.endIf();
 
@@ -417,7 +393,7 @@ public class ShaderProgramPBR extends ShaderProgram {
         if (hasTexture){
             code.l("f0 = texture(material.baseColorTexture, vTexCoord).rgb");
         } else {
-            code.l("f0 = material.color;"); //FIXME: fix
+            code.l("f0 = material.color;");
         }
         code.endIf();
 
@@ -475,7 +451,6 @@ public class ShaderProgramPBR extends ShaderProgram {
 
         ShaderCode fragmentCode = fragmentShader(shaderProperties.hasDirectionalLight,
                 shaderProperties.maxPointLights,
-                shaderProperties.maxSpotLights,
                 shaderProperties.hasTexture,
                 shaderProperties.withShadows);
         //System.out.println("Fragment shader:\n" + fragmentCode);
@@ -499,7 +474,6 @@ public class ShaderProgramPBR extends ShaderProgram {
         /* Initialization of the light's uniform. */
         createUniform("camera_pos");
 
-        //createUniform("ambientLight");
         if (shaderProperties.hasDirectionalLight) {
             createDirectionalLightUniform("directionalLight");
         }
@@ -507,10 +481,6 @@ public class ShaderProgramPBR extends ShaderProgram {
         if (shaderProperties.maxPointLights > 0) {
             createPointLightListUniform("pointLights", shaderProperties.maxPointLights);
         }
-
-//        if (shaderProperties.maxSpotLights > 0) {
-//            createSpotLightUniformList("spotLights", shaderProperties.maxSpotLights);
-//        }
 
         if (shaderProperties.withShadows) {
             createUniform("shadowMapSampler");
